@@ -1,0 +1,52 @@
+# =============================================================================
+# .dockerignore — files excluded from the Docker build context
+# Keeping the build context small makes `docker build` faster and prevents
+# large / sensitive files from being accidentally copied into the image.
+# =============================================================================
+
+# Git metadata (never needed inside the image)
+.git/
+.gitignore
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Trained checkpoints and rendered videos
+# These live on the host and are mounted as a volume at runtime.
+pretrained_models/
+
+# Trackio local metrics cache
+trackio_data/
+
+# Logs produced by training runs
+logs/
+
+# Editor / IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS metadata
+.DS_Store
+
+# Environment variable files (may contain secrets)
+.env
+.env.*
+!.env.example
+
+# Docker files themselves (no recursion needed)
+docker-compose*.yml
+Dockerfile*
+
+# Workshop / documentation (not needed at runtime)
+*.md
