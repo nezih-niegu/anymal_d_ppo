@@ -614,7 +614,9 @@ def train_or_sweep(
             if i_episode % hparams["log_interval"] == 0:
                 logger.info(
                     "[train] Episode %d | Last reward: %.2f | Average reward: %.2f",
-                    i_episode, ep_reward, running_reward,
+                    i_episode,
+                    ep_reward,
+                    running_reward,
                 )
 
             # --- Checkpoint save (with eval video) ----------------------------
@@ -658,7 +660,9 @@ def train_or_sweep(
                 push_checkpoint_to_hub(optim_path)
                 break
 
-        logger.info("[train] Finished training! Running reward is now %s", running_reward)
+        logger.info(
+            "[train] Finished training! Running reward is now %s", running_reward
+        )
     finally:
         env.detach_viewer()
         wandb.finish()
@@ -671,14 +675,20 @@ def run_sweep(count=50, episodes_per_trial=2000, live=False, seed=0):
     trackio run."""
     rng = np.random.default_rng(seed)
     best = {"reward": float("-inf"), "name": None, "params": None}
-    logger.info("[train] Starting random-search sweep: %d trials x %d episodes each", count, episodes_per_trial)
+    logger.info(
+        "[train] Starting random-search sweep: %d trials x %d episodes each",
+        count,
+        episodes_per_trial,
+    )
     for t in range(count):
         sampled = {
             k: _sample_param(v, rng)
             for k, v in sweep_configuration["parameters"].items()
         }
         name = f"{sweep_configuration['name']}_trial{t:03d}"
-        logger.info("[train] === Trial %d/%d :: %s :: %s ===", t + 1, count, name, sampled)
+        logger.info(
+            "[train] === Trial %d/%d :: %s :: %s ===", t + 1, count, name, sampled
+        )
         reward = train_or_sweep(
             is_sweep=True,
             live=live,
@@ -688,8 +698,19 @@ def run_sweep(count=50, episodes_per_trial=2000, live=False, seed=0):
         )
         if reward > best["reward"]:
             best = {"reward": reward, "name": name, "params": sampled}
-        logger.info("[train] Trial %s finished. reward=%s | best so far=%s (%s)", name, reward, best["reward"], best["name"])
-    logger.info("[train] Sweep done. Best trial: %s reward=%s | params=%s", best["name"], best["reward"], best["params"])
+        logger.info(
+            "[train] Trial %s finished. reward=%s | best so far=%s (%s)",
+            name,
+            reward,
+            best["reward"],
+            best["name"],
+        )
+    logger.info(
+        "[train] Sweep done. Best trial: %s reward=%s | params=%s",
+        best["name"],
+        best["reward"],
+        best["params"],
+    )
     return best
 
 
