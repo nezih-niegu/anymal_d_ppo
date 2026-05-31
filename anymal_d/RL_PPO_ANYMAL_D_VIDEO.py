@@ -20,6 +20,7 @@ import os
 import re
 import glob
 import argparse
+import logging
 import numpy as np
 import mujoco
 
@@ -35,6 +36,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 MUJOCO_STEPS = 5
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 
 # --- Paths -------------------------------------------------------------------
@@ -215,7 +223,7 @@ def maybe_download_from_hub(repo_id, filename):
     path = hf_hub_download(
         repo_id=repo_id, filename=filename, token=os.environ.get("HF_TOKEN")
     )
-    print(f"Downloaded {filename} from {repo_id} -> {path}")
+    logger.info("[hf] Downloaded %s from %s -> %s", filename, repo_id, path)
     return path
 
 
@@ -229,7 +237,7 @@ def make_video(num_videos=10, std_init=0.85820, policy_path=None):
 
     if policy_path is None:
         policy_path = pick_latest_checkpoint()
-    print(f"Loading policy from: {policy_path}")
+    logger.info("[config] Loading policy from: %s", policy_path)
     policy = torch.load(policy_path, map_location="cpu", weights_only=False)
     policy.eval()
 
@@ -237,7 +245,7 @@ def make_video(num_videos=10, std_init=0.85820, policy_path=None):
 
     for i_video in range(num_videos):
         ep_reward = test(action_std, env, policy, i_video)
-        print(f"Video #{i_video + 1} reward: {ep_reward}")
+        logger.info("[video] Video #%d reward: %s", i_video + 1, ep_reward)
 
 
 if __name__ == "__main__":
