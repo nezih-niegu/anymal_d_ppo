@@ -1,0 +1,10 @@
+venv/
+data/
+pretrained_models/
+results/
+__pycache__/
+*.pyc
+*.npz
+*.pt
+*.mp4
+*.png
