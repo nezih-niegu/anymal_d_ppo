@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anymal-d-ppo"
+version = "0.2.0"
+description = "ANYmal D quadruped locomotion via PPO (MuJoCo)"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["anymal_d*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "-v"
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]

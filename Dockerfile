@@ -82,6 +82,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ---------------------------------------------------------------------------
 COPY anybotics_anymal_d/ ./anybotics_anymal_d/
 COPY anymal_d/            ./anymal_d/
+COPY scripts/             ./scripts/
+COPY pyproject.toml       ./pyproject.toml
+
+# Install the anymal_d package so `import anymal_d` works from any working dir.
+RUN pip install --no-cache-dir -e .
 
 # Output directories (volume mounts will overlay these at runtime)
 RUN mkdir -p pretrained_models/anymal_d/videos logs
@@ -103,4 +108,4 @@ ENV PYTHONUNBUFFERED=1
 # Override via `docker run` or docker-compose `command:` key.
 # ---------------------------------------------------------------------------
 ENTRYPOINT ["python"]
-CMD ["anymal_d/RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN_RENDERING.py", "train"]
+CMD ["scripts/train_advanced.py", "train"]

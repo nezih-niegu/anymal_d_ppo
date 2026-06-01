@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  lint:
+    name: Format check (black)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install black
+        run: pip install black
+      - name: Check formatting
+        run: black --check --line-length 100 anymal_d/ scripts/ tests/
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: System dependencies (headless OpenGL for MuJoCo renderer)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libosmesa6 libgl1 libglfw3 ffmpeg
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Install package (editable)
+        run: pip install -e .
+
+      - name: Import tests
+        run: pytest tests/test_imports.py -v
+
+      - name: Config loading tests
+        run: pytest tests/test_config.py -v
+
+      - name: Environment tests
+        env:
+          MUJOCO_GL: osmesa
+          MPLBACKEND: Agg
+        run: pytest tests/test_env.py -v
+
+      - name: Smoke training tests
+        env:
+          MUJOCO_GL: osmesa
+          MPLBACKEND: Agg
+        run: pytest tests/test_smoke.py -v
+
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: anymal-d-ppo:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
