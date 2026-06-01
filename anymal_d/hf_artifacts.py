@@ -18,7 +18,12 @@ def _safe_name(value):
 
 
 def upload_file_to_hub(
-    local_path, path_in_repo=None, repo_id=None, token=None, private=None, repo_type="model"
+    local_path,
+    path_in_repo=None,
+    repo_id=None,
+    token=None,
+    private=None,
+    repo_type="model",
 ):
     repo_id, token, private = _resolve_repo_settings(repo_id, token, private)
     if not repo_id:
@@ -82,9 +87,7 @@ def publish_run_artifacts(
     if metadata_extra:
         metadata.update(metadata_extra)
 
-    metadata_name = (
-        f"{_safe_name(run_name)}_{int(episode)}_Reward-{float(running_reward):.2f}_metadata.json"
-    )
+    metadata_name = f"{_safe_name(run_name)}_{int(episode)}_Reward-{float(running_reward):.2f}_metadata.json"
     metadata_path = save_metadata_json(save_dir, metadata_name, metadata)
     upload_file_to_hub(
         metadata_path,

@@ -481,7 +481,9 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
                 torch.save(policy, policy_path)
                 torch.save(optimizer, optim_path)
                 print(f"Policy and Optimizer have been saved to {SAVE_DIR}")
-                ep_reward, video_path, plot_path = test(action_std, env, policy, i_episode)
+                ep_reward, video_path, plot_path = test(
+                    action_std, env, policy, i_episode
+                )
                 publish_artifacts(
                     run_name,
                     i_episode,
