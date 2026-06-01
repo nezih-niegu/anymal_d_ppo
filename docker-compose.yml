@@ -65,17 +65,17 @@ services:
       # Falls back to the CPU-only wheel if not set (safe default for CI / manual runs).
       args:
         PYTORCH_INDEX_URL: ${PYTORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}
-    command: ["anymal_d/RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN_RENDERING.py", "train"]
+    command: ["scripts/train_advanced.py", "train"]
     # Note: --live (MuJoCo interactive viewer) does NOT work inside Docker
     # because there is no display server. Use the render service instead.
 
   # -------------------------------------------------------------------
-  # train-basic — Original MultivariateNormal trainer with annealed std.
-  #              Pairs with the `video` service for evaluation.
+  # train-basic — MultivariateNormal trainer with annealed std.
+  #              Pairs with the `render --basic` service for evaluation.
   # -------------------------------------------------------------------
   train-basic:
     <<: *base
-    command: ["anymal_d/RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN.py"]
+    command: ["scripts/train_basic.py"]
 
   # -------------------------------------------------------------------
   # sweep — Random hyperparameter search (polished trainer).
@@ -84,30 +84,30 @@ services:
   sweep:
     <<: *base
     command:
-      - "anymal_d/RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN_RENDERING.py"
+      - "scripts/train_advanced.py"
       - "sweep"
       - "--sweep-count"
       - "10"          # override with: docker compose run sweep --sweep-count 30
 
   # -------------------------------------------------------------------
   # render — Render evaluation MP4 videos from the best checkpoint
-  #          produced by the polished trainer.
+  #          (polished trainer by default; add --basic for basic trainer).
   # -------------------------------------------------------------------
   render:
     <<: *base
     command:
-      - "anymal_d/RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN_RENDERING.py"
-      - "render"
+      - "scripts/render.py"
       - "--num-videos"
       - "3"
 
   # -------------------------------------------------------------------
-  # video — Render evaluation videos using the basic trainer checkpoint.
+  # video — Render videos from a basic-trainer checkpoint.
   # -------------------------------------------------------------------
   video:
     <<: *base
     command:
-      - "anymal_d/RL_PPO_ANYMAL_D_VIDEO.py"
+      - "scripts/render.py"
+      - "--basic"
       - "--num-videos"
       - "3"
 

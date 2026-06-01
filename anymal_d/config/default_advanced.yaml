@@ -1,0 +1,13 @@
+# Default hyperparameters for the advanced (learnable log_std) PPO trainer.
+gamma: 0.99
+log_interval: 50
+num_episodes: 15000
+lr: 3.0e-4
+clip_param: 0.2
+ppo_epoch: 10
+replay_size: 4096
+batch_size: 128
+c1: 0.5
+c2: 0.005
+max_grad_norm: 0.5
+fall_threshold: 0.35

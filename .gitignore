@@ -1,0 +1,7 @@
+
+# Build artifacts
+*.egg-info/
+__pycache__/
+*.pyc
+.venv/
+uv.lock

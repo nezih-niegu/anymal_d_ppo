@@ -1,0 +1,14 @@
+# Default hyperparameters for the basic (MultivariateNormal) PPO trainer.
+gamma: 0.99
+log_interval: 50
+num_episodes: 15000
+lr: 1.0e-5
+clip_param: 0.1
+ppo_epoch: 48
+replay_size: 6400
+batch_size: 128
+c1: 1.0
+c2: 0.001
+# Std annealing — decays linearly from std_init to std_min over num_episodes.
+std_init: 1.0
+std_min: 0.6
