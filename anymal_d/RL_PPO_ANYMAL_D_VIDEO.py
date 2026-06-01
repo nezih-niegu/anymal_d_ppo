@@ -34,6 +34,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from hf_artifacts import upload_many_to_hub, write_metadata_json
+
 MUJOCO_STEPS = 5
 
 
@@ -53,7 +55,9 @@ def find_project_file(rel_path):
 MODEL_XML = find_project_file(os.path.join("anybotics_anymal_d", "scene.xml"))
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(MODEL_XML), ".."))
 SAVE_DIR = os.path.join(PROJECT_ROOT, "pretrained_models", "anymal_d")
+METADATA_DIR = os.path.join(SAVE_DIR, "metadata")
 os.makedirs(SAVE_DIR, exist_ok=True)
+os.makedirs(METADATA_DIR, exist_ok=True)
 
 
 class Agent(nn.Module):
@@ -174,7 +178,7 @@ def test(action_std, env, policy, num_video, render=False):
         cumulative_reward_list.append(ep_reward)
         counter = counter + 1
 
-    env.close(num_video + 1, ep_reward)
+    video_path = env.close(num_video + 1, ep_reward)
     # (Experiment-tracker video logging is intentionally off in this script.)
 
     # Plotting episode reward
@@ -184,10 +188,11 @@ def test(action_std, env, policy, num_video, render=False):
     plt.xlabel("Time (seconds)")
     plt.ylabel("Reward")
     plt.title("Episode instant and cumulative Reward")
-    plt.savefig(os.path.join(SAVE_DIR, f"video_reward_{num_video + 1}.png"))
+    plot_path = os.path.join(SAVE_DIR, f"video_reward_{num_video + 1}.png")
+    plt.savefig(plot_path)
     plt.close()
 
-    return ep_reward
+    return ep_reward, video_path, plot_path
 
 
 def pick_latest_checkpoint(save_dir=SAVE_DIR):
@@ -236,7 +241,27 @@ def make_video(num_videos=10, std_init=0.85820, policy_path=None):
     action_std = std_init
 
     for i_video in range(num_videos):
-        ep_reward = test(action_std, env, policy, i_video)
+        ep_reward, video_path, plot_path = test(action_std, env, policy, i_video)
+        metadata_path = os.path.join(METADATA_DIR, f"video_{i_video + 1}_metadata.json")
+        metadata = {
+            "script": os.path.basename(__file__),
+            "policy_path": os.path.basename(policy_path),
+            "video_index": i_video + 1,
+            "episode_reward": float(ep_reward),
+            "std_init": float(std_init),
+            "artifacts": {
+                "video": os.path.basename(video_path),
+                "plot": os.path.basename(plot_path),
+            },
+        }
+        write_metadata_json(metadata_path, metadata)
+        upload_many_to_hub(
+            [
+                (video_path, f"videos/{os.path.basename(video_path)}"),
+                (plot_path, f"plots/{os.path.basename(plot_path)}"),
+                (metadata_path, f"metadata/{os.path.basename(metadata_path)}"),
+            ]
+        )
         print(f"Video #{i_video + 1} reward: {ep_reward}")
 
 

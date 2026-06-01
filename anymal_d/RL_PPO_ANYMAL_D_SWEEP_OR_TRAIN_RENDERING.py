@@ -47,6 +47,8 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 
+from hf_artifacts import publish_run_artifacts
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 PROJECT = "AIDL-PPO-ANYMAL_D"
@@ -72,39 +74,10 @@ MODEL_XML = find_project_file(os.path.join("anybotics_anymal_d", "scene.xml"))
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(MODEL_XML), ".."))
 SAVE_DIR = os.path.join(PROJECT_ROOT, "pretrained_models", "anymal_d")
 VIDEO_DIR = os.path.join(SAVE_DIR, "videos")
+METADATA_DIR = os.path.join(SAVE_DIR, "metadata")
 os.makedirs(SAVE_DIR, exist_ok=True)
 os.makedirs(VIDEO_DIR, exist_ok=True)
-
-
-# --- Hugging Face Hub checkpoint upload (replaces wandb.save) -----------------
-def push_checkpoint_to_hub(local_path, path_in_repo=None):
-    """Upload a checkpoint to a HF Hub model repo if HF_MODEL_REPO is set;
-    otherwise a no-op (file is already saved locally)."""
-    repo_id = os.environ.get("HF_MODEL_REPO")
-    if not repo_id:
-        return None
-    try:
-        from huggingface_hub import HfApi
-
-        api = HfApi(token=os.environ.get("HF_TOKEN"))
-        api.create_repo(
-            repo_id,
-            repo_type="model",
-            exist_ok=True,
-            private=os.environ.get("HF_PRIVATE", "1") == "1",
-        )
-        api.upload_file(
-            path_or_fileobj=local_path,
-            path_in_repo=path_in_repo or os.path.basename(local_path),
-            repo_id=repo_id,
-            repo_type="model",
-        )
-        url = f"https://huggingface.co/{repo_id}"
-        print(f"  uploaded {os.path.basename(local_path)} -> {url}")
-        return url
-    except Exception as e:
-        print(f"  [hub] upload skipped ({e})")
-        return None
+os.makedirs(METADATA_DIR, exist_ok=True)
 
 
 # --- Action / observation constants -----------------------------------------
@@ -429,6 +402,7 @@ def render_episode(
         except Exception as e:
             print(f"  [trackio] video log skipped ({e})")
 
+    plot_path = None
     if save_plot:
         plt.figure()
         plt.plot(time_list, reward_list, label="instant")
@@ -451,7 +425,24 @@ def render_episode(
                 print(f"  [trackio] plot log skipped ({e})")
         plt.close()
 
-    return ep_reward, video_path
+    return ep_reward, video_path, plot_path
+
+
+def publish_artifacts(run_name, episode, running_reward, hparams, artifact_paths):
+    return publish_run_artifacts(
+        save_dir=METADATA_DIR,
+        run_name=run_name,
+        episode=episode,
+        running_reward=running_reward,
+        hparams=hparams,
+        artifact_paths=artifact_paths,
+        repo_subdirs={
+            "policy": "checkpoints",
+            "optimizer": "checkpoints",
+            "video": "videos",
+            "plot": "plots",
+        },
+    )
 
 
 def pick_latest_checkpoint(save_dir=SAVE_DIR):
@@ -622,16 +613,26 @@ def train_or_sweep(
                 )
                 torch.save(policy, policy_path)
                 torch.save(optimizer, optim_path)
-                push_checkpoint_to_hub(policy_path)  # replaces wandb.save
-                push_checkpoint_to_hub(optim_path)
                 print(f"Saved checkpoint to {SAVE_DIR}")
-                render_episode(
+                ep_reward, video_path, plot_path = render_episode(
                     env,
                     policy,
                     i_episode,
                     log_media=True,
                     save_plot=True,
                     prefix="checkpoint",
+                )
+                publish_artifacts(
+                    run_name,
+                    i_episode,
+                    running_reward,
+                    hparams,
+                    {
+                        "policy": policy_path,
+                        "optimizer": optim_path,
+                        "video": video_path,
+                        "plot": plot_path,
+                    },
                 )
 
             if running_reward > target_reward:
@@ -646,8 +647,26 @@ def train_or_sweep(
                 )
                 torch.save(policy, policy_path)
                 torch.save(optimizer, optim_path)
-                push_checkpoint_to_hub(policy_path)
-                push_checkpoint_to_hub(optim_path)
+                ep_reward, video_path, plot_path = render_episode(
+                    env,
+                    policy,
+                    i_episode,
+                    log_media=True,
+                    save_plot=True,
+                    prefix="solved",
+                )
+                publish_artifacts(
+                    run_name,
+                    i_episode,
+                    running_reward,
+                    hparams,
+                    {
+                        "policy": policy_path,
+                        "optimizer": optim_path,
+                        "video": video_path,
+                        "plot": plot_path,
+                    },
+                )
                 break
 
         print(f"Finished training! Running reward is now {running_reward}")
