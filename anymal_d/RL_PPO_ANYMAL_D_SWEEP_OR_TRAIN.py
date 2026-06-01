@@ -393,6 +393,8 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
 
     # trackio.init mirrors wandb.init. space_id (optional) hosts a free dashboard
     # on Hugging Face Spaces; without it the dashboard runs locally.
+    if not os.environ.get("TRACKIO_SPACE_ID"):
+        os.environ.pop("TRACKIO_SPACE_ID", None)
     run = wandb.init(
         project=PROJECT,
         name=run_name,
@@ -565,8 +567,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if args.sweep:
-        run_sweep(count=args.sweep_count, episodes_per_trial=args.sweep_episodes)
-    else:
-        # Train with the specified hparams.
-        train_or_sweep(is_sweep=False)
+    try:
+        if args.sweep:
+            run_sweep(count=args.sweep_count, episodes_per_trial=args.sweep_episodes)
+        else:
+            train_or_sweep(is_sweep=False)
+    except KeyboardInterrupt:
+        print("\nInterrupted.")
