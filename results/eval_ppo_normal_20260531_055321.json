@@ -1,0 +1,125 @@
+{
+  "summary": {
+    "policy": "ppo_normal",
+    "checkpoint": "pretrained_models/anymal_d/brave-forest-1_5931_Reward-1805.2_policy.pt",
+    "num_episodes": 10,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reward_mean": 306.6294,
+    "reward_std": 0.0,
+    "reward_min": 306.6294,
+    "reward_max": 306.6294,
+    "episode_length_mean": 162.0,
+    "forward_velocity_mean": 0.7484,
+    "fall_rate": 1.0,
+    "eval_wall_time_s": 1.19,
+    "env": {
+      "action_convention": "delta",
+      "obs_convention": "noxy",
+      "reward_fn": "shaped",
+      "fall_threshold": 0.35
+    }
+  },
+  "episodes": [
+    {
+      "seed": 0,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 1
+    },
+    {
+      "seed": 1,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 2
+    },
+    {
+      "seed": 2,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 3
+    },
+    {
+      "seed": 3,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 4
+    },
+    {
+      "seed": 4,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 5
+    },
+    {
+      "seed": 5,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 6
+    },
+    {
+      "seed": 6,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 7
+    },
+    {
+      "seed": 7,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 8
+    },
+    {
+      "seed": 8,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 9
+    },
+    {
+      "seed": 9,
+      "episode_reward": 306.6294,
+      "episode_length": 162,
+      "forward_velocity_mean": 0.7484,
+      "forward_velocity_max": 1.5067,
+      "fell": true,
+      "episode": 10
+    }
+  ]
+}

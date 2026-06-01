@@ -1,0 +1,58 @@
+{
+  "summary": {
+    "policy": "ppo_normal",
+    "checkpoint": "pretrained_models/anymal_d/brave-forest-1_5931_Reward-1805.2_policy.pt",
+    "num_episodes": 3,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "reward_mean": 1156.2613,
+    "reward_std": 712.7548,
+    "reward_min": 463.8073,
+    "reward_max": 2136.846,
+    "episode_length_mean": 520.0,
+    "forward_velocity_mean": 0.9488,
+    "fall_rate": 0.6667,
+    "eval_wall_time_s": 4.47,
+    "env": {
+      "action_convention": "delta",
+      "obs_convention": "noxy",
+      "reward_fn": "shaped",
+      "fall_threshold": 0.35
+    }
+  },
+  "episodes": [
+    {
+      "seed": 0,
+      "episode_reward": 2136.846,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4598,
+      "forward_velocity_max": 2.1148,
+      "fell": false,
+      "episode": 1,
+      "video_path": "results/videos/ppo_normal_ep1_seed0_20260531_091906.mp4"
+    },
+    {
+      "seed": 1,
+      "episode_reward": 868.1306,
+      "episode_length": 501,
+      "forward_velocity_mean": 0.7176,
+      "forward_velocity_max": 2.0566,
+      "fell": true,
+      "episode": 2,
+      "video_path": "results/videos/ppo_normal_ep2_seed1_20260531_091908.mp4"
+    },
+    {
+      "seed": 2,
+      "episode_reward": 463.8073,
+      "episode_length": 258,
+      "forward_velocity_mean": 0.669,
+      "forward_velocity_max": 1.4756,
+      "fell": true,
+      "episode": 3,
+      "video_path": "results/videos/ppo_normal_ep3_seed2_20260531_091909.mp4"
+    }
+  ]
+}
