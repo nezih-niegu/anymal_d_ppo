@@ -1,6 +1,7 @@
 """
 Smoke tests — CPU-only, no MuJoCo, no GPU required.
 """
+
 import yaml
 
 
