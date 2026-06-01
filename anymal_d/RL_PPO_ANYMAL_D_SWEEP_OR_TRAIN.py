@@ -30,6 +30,7 @@ Usage:
 import os
 import glob
 import argparse
+import logging
 import numpy as np
 import mujoco
 
@@ -54,6 +55,13 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 PROJECT = "AIDL-PPO-ANYMAL_D"
 MUJOCO_STEPS = 5
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 
 # --- Paths -------------------------------------------------------------------
@@ -103,10 +111,10 @@ def push_checkpoint_to_hub(local_path, path_in_repo=None):
             repo_type="model",
         )
         url = f"https://huggingface.co/{repo_id}"
-        print(f"  uploaded {os.path.basename(local_path)} -> {url}")
+        logger.info("[hf] Uploaded %s -> %s", os.path.basename(local_path), url)
         return url
     except Exception as e:
-        print(f"  [hub] upload skipped ({e})")
+        logger.warning("[hf] Upload skipped: %s", e)
         return None
 
 
@@ -315,7 +323,7 @@ def test(action_std, env, policy, episode, render=False):
     try:
         wandb.log({"Video eval": wandb.Video(video_path, fps=4, format="mp4")})
     except Exception as e:
-        print(f"  [trackio] video log skipped ({e})")
+        logger.warning("[trackio] Video log skipped: %s", e)
 
     # Plot episode reward. trackio.log takes media objects (Image), not the raw
     # pyplot module, so we save the figure and log it as an Image.
@@ -332,7 +340,7 @@ def test(action_std, env, policy, episode, render=False):
     try:
         wandb.log({"Reward eval": wandb.Image(plot_path)})
     except Exception as e:
-        print(f"  [trackio] plot log skipped ({e})")
+        logger.warning("[trackio] Plot log skipped: %s", e)
 
     return ep_reward
 
@@ -387,7 +395,7 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
     }
     if overrides:
         hparams.update(overrides)
-        print(f"Params updated from sweep: {overrides}")
+        logger.info("[config] Params updated from sweep: %s", overrides)
     if num_episodes is not None:
         hparams["num_episodes"] = num_episodes
 
@@ -432,7 +440,7 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
 
     # Define the target_reward to stop the run before reaching num_episodes
     target_reward = 10000
-    print(f"Target reward: {target_reward}")
+    logger.info("[train] Target reward: %d", target_reward)
 
     # Training loop
     running_reward = -100
@@ -470,8 +478,12 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
 
         # Log to check episode rewards and std
         if i_episode % hparams["log_interval"] == 0:
-            print(
-                f"Episode {i_episode}\tLast reward: {ep_reward:.2f}\tAverage reward: {running_reward:.2f}\tAction standard deviation: {action_std:.5f}"
+            logger.info(
+                "[train] Episode %d | Last reward: %.2f | Average reward: %.2f | Action std: %.5f",
+                i_episode,
+                ep_reward,
+                running_reward,
+                action_std,
             )
             action_std = action_std - action_std_decay
             action_std = round(action_std, 5)
@@ -492,11 +504,11 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
                 torch.save(optimizer, optim_path)
                 push_checkpoint_to_hub(policy_path)  # replaces wandb.save
                 push_checkpoint_to_hub(optim_path)
-                print(f"Policy and Optimizer have been saved to {SAVE_DIR}")
+                logger.info("[checkpoint] Policy and optimizer saved to %s", SAVE_DIR)
                 ep_reward = test(action_std, env, policy, i_episode)
 
         if running_reward > target_reward:
-            print("Solved!")
+            logger.info("[train] Solved!")
             policy_path = os.path.join(
                 SAVE_DIR, f"{run_name}_{i_episode}_Reward-{running_reward}_policy.pt"
             )
@@ -509,7 +521,7 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
             push_checkpoint_to_hub(optim_path)
             break
 
-    print(f"Finished training! Running reward is now {running_reward}")
+    logger.info("[train] Finished training! Running reward is now %s", running_reward)
     wandb.finish()
     return running_reward
 
@@ -520,8 +532,10 @@ def run_sweep(count=50, episodes_per_trial=2000, seed=0):
     trackio run. trackio has no built-in sweep agent, so we drive it here."""
     rng = np.random.default_rng(seed)
     best = {"reward": float("-inf"), "name": None, "params": None}
-    print(
-        f"Starting random-search sweep: {count} trials x {episodes_per_trial} episodes each"
+    logger.info(
+        "[train] Starting random-search sweep: %d trials x %d episodes each",
+        count,
+        episodes_per_trial,
     )
     for t in range(count):
         sampled = {
@@ -529,7 +543,9 @@ def run_sweep(count=50, episodes_per_trial=2000, seed=0):
             for k, v in sweep_configuration["parameters"].items()
         }
         name = f"{sweep_configuration['name']}_trial{t:03d}"
-        print(f"\n=== Trial {t + 1}/{count} :: {name} :: {sampled} ===")
+        logger.info(
+            "[train] === Trial %d/%d :: %s :: %s ===", t + 1, count, name, sampled
+        )
         reward = train_or_sweep(
             is_sweep=True,
             overrides=sampled,
@@ -538,11 +554,18 @@ def run_sweep(count=50, episodes_per_trial=2000, seed=0):
         )
         if reward > best["reward"]:
             best = {"reward": reward, "name": name, "params": sampled}
-        print(
-            f"Trial {name} finished. reward={reward}  | best so far={best['reward']} ({best['name']})"
+        logger.info(
+            "[train] Trial %s finished. reward=%s | best so far=%s (%s)",
+            name,
+            reward,
+            best["reward"],
+            best["name"],
         )
-    print(
-        f"\nSweep done. Best trial: {best['name']}  reward={best['reward']}\n  params={best['params']}"
+    logger.info(
+        "[train] Sweep done. Best trial: %s reward=%s | params=%s",
+        best["name"],
+        best["reward"],
+        best["params"],
     )
     return best
 
