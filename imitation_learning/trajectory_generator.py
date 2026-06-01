@@ -6,7 +6,9 @@ def wrap_to_pi(angle: float) -> float:
 
 
 class WaypointTrajectory:
-    def __init__(self, waypoints, speed=0.15, dt=0.01, hold_final=True, start_delay=3.0):
+    def __init__(
+        self, waypoints, speed=0.15, dt=0.01, hold_final=True, start_delay=3.0
+    ):
         self.waypoints = np.asarray(waypoints, dtype=float)
         self.speed = float(speed)
         self.dt = float(dt)

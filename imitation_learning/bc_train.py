@@ -123,12 +123,18 @@ def train(cfg):
     dataset = TensorDataset(obs_t, act_t)
     val_size = max(1, int(len(dataset) * cfg["training"]["val_split"]))
     train_ds, val_ds = random_split(dataset, [len(dataset) - val_size, val_size])
-    train_loader = DataLoader(train_ds, batch_size=cfg["training"]["batch_size"], shuffle=True)
+    train_loader = DataLoader(
+        train_ds, batch_size=cfg["training"]["batch_size"], shuffle=True
+    )
     val_loader = DataLoader(val_ds, batch_size=cfg["training"]["batch_size"])
 
     mc = cfg["model"]
-    policy = BCPolicy(mc["obs_dim"], mc["act_dim"], mc["hidden_dim"], mc["n_layers"]).to(device)
-    optimizer = torch.optim.Adam(policy.parameters(), lr=cfg["training"]["learning_rate"])
+    policy = BCPolicy(
+        mc["obs_dim"], mc["act_dim"], mc["hidden_dim"], mc["n_layers"]
+    ).to(device)
+    optimizer = torch.optim.Adam(
+        policy.parameters(), lr=cfg["training"]["learning_rate"]
+    )
 
     ckpt_dir = cfg["output"]["checkpoint_dir"]
     os.makedirs(ckpt_dir, exist_ok=True)
@@ -150,7 +156,9 @@ def train(cfg):
         val_losses = []
         with torch.no_grad():
             for obs_b, act_b in val_loader:
-                val_losses.append(F.mse_loss(policy(obs_b.to(device)), act_b.to(device)).item())
+                val_losses.append(
+                    F.mse_loss(policy(obs_b.to(device)), act_b.to(device)).item()
+                )
 
         tl, vl = np.mean(train_losses), np.mean(val_losses)
         results["train_loss"].append(float(tl))
@@ -160,11 +168,16 @@ def train(cfg):
 
         if epoch % cfg["training"]["checkpoint_freq"] == 0:
             ckpt_path = os.path.join(ckpt_dir, f"bc_epoch_{epoch}.pt")
-            torch.save({"epoch": epoch, "model_state": policy.state_dict(), "config": cfg}, ckpt_path)
+            torch.save(
+                {"epoch": epoch, "model_state": policy.state_dict(), "config": cfg},
+                ckpt_path,
+            )
             log.info(f"Checkpoint: {ckpt_path}")
 
     final = os.path.join(ckpt_dir, "bc_final.pt")
-    torch.save({"epoch": epochs, "model_state": policy.state_dict(), "config": cfg}, final)
+    torch.save(
+        {"epoch": epochs, "model_state": policy.state_dict(), "config": cfg}, final
+    )
     log.info(f"Final checkpoint: {final}")
 
     results_dir = cfg["output"]["results_dir"]
@@ -189,7 +202,9 @@ def evaluate_bc(policy, cfg, n_episodes=5):
         total_reward = 0.0
         fell = False
         for step in range(cfg["dataset"]["episode_steps"]):
-            obs = torch.tensor(get_obs(data), dtype=torch.float32).unsqueeze(0).to(device)
+            obs = (
+                torch.tensor(get_obs(data), dtype=torch.float32).unsqueeze(0).to(device)
+            )
             with torch.no_grad():
                 action = policy(obs).squeeze(0).cpu().numpy()
             data.ctrl[:] = action
@@ -230,7 +245,9 @@ def main():
 
     if args.eval_only:
         mc = cfg["model"]
-        policy = BCPolicy(mc["obs_dim"], mc["act_dim"], mc["hidden_dim"], mc["n_layers"])
+        policy = BCPolicy(
+            mc["obs_dim"], mc["act_dim"], mc["hidden_dim"], mc["n_layers"]
+        )
         ckpt = torch.load(args.checkpoint, map_location="cpu")
         policy.load_state_dict(ckpt["model_state"])
         metrics = evaluate_bc(policy, cfg)

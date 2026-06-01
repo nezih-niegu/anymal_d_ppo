@@ -3,11 +3,13 @@ convert_waypoint_demos.py
 Converts waypoint trajectory CSV from previous quadruped project
 into observation-action pairs for ANYmal D behavior cloning.
 """
+
 import os
 import json
 import numpy as np
 import pandas as pd
 import mujoco
+
 
 def find_scene_xml():
     seeds = [os.path.dirname(os.path.abspath(__file__)), os.getcwd()]
@@ -20,8 +22,10 @@ def find_scene_xml():
             d = os.path.dirname(d)
     raise FileNotFoundError("scene.xml not found")
 
+
 def get_obs(data):
     return np.concatenate([data.qpos.copy(), data.qvel.copy()])
+
 
 def velocity_cmd_to_joint_action(model, data, vx_cmd, vy_cmd, wz_cmd, nominal):
     """
@@ -32,21 +36,22 @@ def velocity_cmd_to_joint_action(model, data, vx_cmd, vy_cmd, wz_cmd, nominal):
     scale = 0.3
     action = nominal.copy()
     # Forward velocity -> extend front legs slightly
-    action[0]  += vx_cmd * scale   # LF_HAA
-    action[3]  += vx_cmd * scale   # RF_HAA
-    action[6]  -= vx_cmd * scale   # LH_HAA
-    action[9]  -= vx_cmd * scale   # RH_HAA
+    action[0] += vx_cmd * scale  # LF_HAA
+    action[3] += vx_cmd * scale  # RF_HAA
+    action[6] -= vx_cmd * scale  # LH_HAA
+    action[9] -= vx_cmd * scale  # RH_HAA
     # Lateral velocity -> adjust HFE joints
-    action[1]  += vy_cmd * scale
-    action[4]  -= vy_cmd * scale
-    action[7]  += vy_cmd * scale
+    action[1] += vy_cmd * scale
+    action[4] -= vy_cmd * scale
+    action[7] += vy_cmd * scale
     action[10] -= vy_cmd * scale
     # Yaw -> differential HAA
-    action[0]  += wz_cmd * scale * 0.5
-    action[3]  -= wz_cmd * scale * 0.5
-    action[6]  += wz_cmd * scale * 0.5
-    action[9]  -= wz_cmd * scale * 0.5
+    action[0] += wz_cmd * scale * 0.5
+    action[3] -= wz_cmd * scale * 0.5
+    action[6] += wz_cmd * scale * 0.5
+    action[9] -= wz_cmd * scale * 0.5
     return np.clip(action, -1.0, 1.0)
+
 
 def convert_demos(csv_path, output_path, n_repeat=5):
     print(f"Loading CSV: {csv_path}")
@@ -90,17 +95,20 @@ def convert_demos(csv_path, output_path, n_repeat=5):
         output_path,
         observations=observations,
         actions=actions,
-        metadata=json.dumps({
-            "obs_dim": int(observations.shape[1]),
-            "act_dim": int(actions.shape[1]),
-            "n_samples": int(observations.shape[0]),
-            "source": "waypoint_walk_demo_csv",
-            "original_repo": "carloAdr1/quadruped-optimal-control-waypoints",
-        })
+        metadata=json.dumps(
+            {
+                "obs_dim": int(observations.shape[1]),
+                "act_dim": int(actions.shape[1]),
+                "n_samples": int(observations.shape[0]),
+                "source": "waypoint_walk_demo_csv",
+                "original_repo": "carloAdr1/quadruped-optimal-control-waypoints",
+            }
+        ),
     )
     print(f"Saved: {output_path}")
     print(f"  obs: {observations.shape}, acts: {actions.shape}")
     return observations, actions
+
 
 if __name__ == "__main__":
     convert_demos(
