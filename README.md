@@ -60,7 +60,7 @@ anymal_d_ppo/
 
 ---
 
-## Module guide
+## Module guide base
 
 | Module | What it provides |
 |---|---|
