@@ -1,0 +1,30 @@
+{
+  "Policy": [
+    "PPO",
+    "Flow Matching"
+  ],
+  "Reward mean": [
+    1770.4537,
+    1632.4461
+  ],
+  "Reward std": [
+    516.917,
+    596.3449
+  ],
+  "Fwd velocity (m/s)": [
+    1.2707,
+    1.215
+  ],
+  "Fall rate": [
+    "30%",
+    "40%"
+  ],
+  "Consistency (std)": [
+    516.917,
+    596.3449
+  ],
+  "Ep length mean": [
+    712.7,
+    675.4
+  ]
+}

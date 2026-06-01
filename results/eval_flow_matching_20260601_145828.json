@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "policy": "flow_matching",
+    "checkpoint": "pretrained_models/flow_matching/best_flow_policy.pt",
+    "num_episodes": 3,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "reward_mean": 1864.7286,
+    "reward_std": 363.2884,
+    "reward_min": 1351.0505,
+    "reward_max": 2129.8591,
+    "episode_length_mean": 739.0,
+    "forward_velocity_mean": 1.3106,
+    "fall_rate": 0.3333,
+    "eval_wall_time_s": 32.72,
+    "env": {
+      "action_convention": "delta",
+      "obs_convention": "noxy",
+      "reward_fn": "shaped",
+      "fall_threshold": 0.35
+    }
+  },
+  "episodes": [
+    {
+      "seed": 0,
+      "episode_reward": 1351.0505,
+      "episode_length": 615,
+      "forward_velocity_mean": 1.0589,
+      "forward_velocity_max": 2.076,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 1,
+      "video_path": "results/videos/flow_matching_ep1_seed0_20260601_145804.mp4"
+    },
+    {
+      "seed": 1,
+      "episode_reward": 2129.8591,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4601,
+      "forward_velocity_max": 2.3439,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 2,
+      "video_path": "results/videos/flow_matching_ep2_seed1_20260601_145816.mp4"
+    },
+    {
+      "seed": 2,
+      "episode_reward": 2113.2762,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4129,
+      "forward_velocity_max": 2.1264,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 3,
+      "video_path": "results/videos/flow_matching_ep3_seed2_20260601_145827.mp4"
+    }
+  ]
+}
