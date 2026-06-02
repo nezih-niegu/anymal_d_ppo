@@ -58,10 +58,11 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(MODEL_XML), ".."))
 SAVE_DIR = os.path.join(PROJECT_ROOT, "pretrained_models", "anymal_d")
 os.makedirs(SAVE_DIR, exist_ok=True)
 
+
 class AnymalROS2Bridge(Node):
     def __init__(self):
-        super().__init__('anymal_mujoco_bridge', namespace='anymal')
-        self.publisher_ = self.create_publisher(Float64MultiArray, 'action', 10)
+        super().__init__("anymal_mujoco_bridge", namespace="anymal")
+        self.publisher_ = self.create_publisher(Float64MultiArray, "action", 10)
 
     def publish_action(self, action_data):
         msg = Float64MultiArray()
@@ -180,10 +181,10 @@ def test(action_std, env, policy, num_video, ros_bridge, render=False):
     time_list = []
     while not done:
         action, _, _ = policy.compute_action(state, action_std)
-        
+
         ros_bridge.publish_action(action)
         rclpy.spin_once(ros_bridge, timeout_sec=0.0)
-        
+
         state, reward, done = env.step(action, render=True)
         reward_list.append(reward)
         time_list.append(counter * 0.002 * MUJOCO_STEPS)
@@ -244,29 +245,29 @@ def make_video(num_videos=10, std_init=0.85820, policy_path=None):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
 
-    
     if policy_path is None:
         policy_path = pick_latest_checkpoint()
     print(f"Loading policy from: {policy_path}")
     policy = torch.load(policy_path, map_location="cpu", weights_only=False)
     policy.eval()
-    '''    
+    """    
     print("Iniciando modelo aleatorio para prueba de ROS 2...")
     
     policy = Agent(37, 12) 
     policy.eval()
-    '''
+    """
     action_std = std_init
-    
+
     rclpy.init()
     ros_bridge = AnymalROS2Bridge()
 
     for i_video in range(num_videos):
         ep_reward = test(action_std, env, policy, i_video, ros_bridge)
         print(f"Video #{i_video + 1} reward: {ep_reward}")
-    
+
     ros_bridge.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Render ANYmal D evaluation videos")
