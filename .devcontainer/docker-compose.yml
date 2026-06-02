@@ -1,0 +1,20 @@
+services:
+  anymal-dev:
+    container_name: anymal_d_ppo_dev
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/home/dev/ws:cached
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    working_dir: /home/dev/ws
+    environment:
+      - DISPLAY=${DISPLAY}
+      - MPLBACKEND=TkAgg
+      - PYTHONUNBUFFERED=1
+      - HF_MODEL_REPO
+      - HF_TOKEN
+      - HF_PRIVATE=${HF_PRIVATE:-1}
+      - TRACKIO_SPACE_ID
+    network_mode: host
+    command: sleep infinity
