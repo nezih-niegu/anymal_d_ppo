@@ -48,6 +48,8 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 
+from hf_artifacts import publish_run_artifacts
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 PROJECT = "AIDL-PPO-ANYMAL_D"
@@ -80,6 +82,7 @@ MODEL_XML = find_project_file(os.path.join("anybotics_anymal_d", "scene.xml"))
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(MODEL_XML), ".."))
 SAVE_DIR = os.path.join(PROJECT_ROOT, "pretrained_models", "anymal_d")
 VIDEO_DIR = os.path.join(SAVE_DIR, "videos")
+METADATA_DIR = os.path.join(SAVE_DIR, "metadata")
 os.makedirs(SAVE_DIR, exist_ok=True)
 os.makedirs(VIDEO_DIR, exist_ok=True)
 
@@ -437,6 +440,7 @@ def render_episode(
         except Exception as e:
             logger.warning("[trackio] Video log skipped: %s", e)
 
+    plot_path = None
     if save_plot:
         plt.figure()
         plt.plot(time_list, reward_list, label="instant")
@@ -459,7 +463,24 @@ def render_episode(
                 logger.warning("[trackio] Plot log skipped: %s", e)
         plt.close()
 
-    return ep_reward, video_path
+    return ep_reward, video_path, plot_path
+
+
+def publish_artifacts(run_name, episode, running_reward, hparams, artifact_paths):
+    return publish_run_artifacts(
+        save_dir=METADATA_DIR,
+        run_name=run_name,
+        episode=episode,
+        running_reward=running_reward,
+        hparams=hparams,
+        artifact_paths=artifact_paths,
+        repo_subdirs={
+            "policy": "checkpoints",
+            "optimizer": "checkpoints",
+            "video": "videos",
+            "plot": "plots",
+        },
+    )
 
 
 def pick_latest_checkpoint(save_dir=SAVE_DIR):
@@ -643,6 +664,18 @@ def train_or_sweep(
                     save_plot=True,
                     prefix="checkpoint",
                 )
+                publish_artifacts(
+                    run_name,
+                    i_episode,
+                    running_reward,
+                    hparams,
+                    {
+                        "policy": policy_path,
+                        "optimizer": optim_path,
+                        "video": video_path,
+                        "plot": plot_path,
+                    },
+                )
 
             if running_reward > target_reward:
                 logger.info("[train] Solved!")
@@ -656,8 +689,26 @@ def train_or_sweep(
                 )
                 torch.save(policy, policy_path)
                 torch.save(optimizer, optim_path)
-                push_checkpoint_to_hub(policy_path)
-                push_checkpoint_to_hub(optim_path)
+                ep_reward, video_path, plot_path = render_episode(
+                    env,
+                    policy,
+                    i_episode,
+                    log_media=True,
+                    save_plot=True,
+                    prefix="solved",
+                )
+                publish_artifacts(
+                    run_name,
+                    i_episode,
+                    running_reward,
+                    hparams,
+                    {
+                        "policy": policy_path,
+                        "optimizer": optim_path,
+                        "video": video_path,
+                        "plot": plot_path,
+                    },
+                )
                 break
 
         logger.info(

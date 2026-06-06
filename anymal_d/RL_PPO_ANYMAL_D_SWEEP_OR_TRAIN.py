@@ -51,6 +51,8 @@ import torch.nn.functional as F
 from torch.distributions import MultivariateNormal
 from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 
+from hf_artifacts import publish_run_artifacts
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 PROJECT = "AIDL-PPO-ANYMAL_D"
@@ -84,6 +86,7 @@ def find_project_file(rel_path):
 MODEL_XML = find_project_file(os.path.join("anybotics_anymal_d", "scene.xml"))
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(MODEL_XML), ".."))
 SAVE_DIR = os.path.join(PROJECT_ROOT, "pretrained_models", "anymal_d")
+METADATA_DIR = os.path.join(SAVE_DIR, "metadata")
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 
@@ -342,7 +345,24 @@ def test(action_std, env, policy, episode, render=False):
     except Exception as e:
         logger.warning("[trackio] Plot log skipped: %s", e)
 
-    return ep_reward
+    return ep_reward, video_path, plot_path
+
+
+def publish_artifacts(run_name, episode, running_reward, hparams, artifact_paths):
+    return publish_run_artifacts(
+        save_dir=METADATA_DIR,
+        run_name=run_name,
+        episode=episode,
+        running_reward=running_reward,
+        hparams=hparams,
+        artifact_paths=artifact_paths,
+        repo_subdirs={
+            "policy": "checkpoints",
+            "optimizer": "checkpoints",
+            "video": "videos",
+            "plot": "plots",
+        },
+    )
 
 
 # Same parameter ranges as the original wandb sweep. Used by `run_sweep` below.
@@ -517,8 +537,19 @@ def train_or_sweep(is_sweep=True, overrides=None, run_name=None, num_episodes=No
             )
             torch.save(policy, policy_path)
             torch.save(optimizer, optim_path)
-            push_checkpoint_to_hub(policy_path)
-            push_checkpoint_to_hub(optim_path)
+            ep_reward, video_path, plot_path = test(action_std, env, policy, i_episode)
+            publish_artifacts(
+                run_name,
+                i_episode,
+                running_reward,
+                hparams,
+                {
+                    "policy": policy_path,
+                    "optimizer": optim_path,
+                    "video": video_path,
+                    "plot": plot_path,
+                },
+            )
             break
 
     logger.info("[train] Finished training! Running reward is now %s", running_reward)
