@@ -20,6 +20,7 @@ import os
 import re
 import glob
 import argparse
+import logging
 import numpy as np
 import mujoco
 
@@ -37,6 +38,13 @@ import torch.nn.functional as F
 from hf_artifacts import upload_many_to_hub, write_metadata_json
 
 MUJOCO_STEPS = 5
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 
 # --- Paths -------------------------------------------------------------------
@@ -220,7 +228,7 @@ def maybe_download_from_hub(repo_id, filename):
     path = hf_hub_download(
         repo_id=repo_id, filename=filename, token=os.environ.get("HF_TOKEN")
     )
-    print(f"Downloaded {filename} from {repo_id} -> {path}")
+    logger.info("[hf] Downloaded %s from %s -> %s", filename, repo_id, path)
     return path
 
 
@@ -234,35 +242,15 @@ def make_video(num_videos=10, std_init=0.85820, policy_path=None):
 
     if policy_path is None:
         policy_path = pick_latest_checkpoint()
-    print(f"Loading policy from: {policy_path}")
+    logger.info("[config] Loading policy from: %s", policy_path)
     policy = torch.load(policy_path, map_location="cpu", weights_only=False)
     policy.eval()
 
     action_std = std_init
 
     for i_video in range(num_videos):
-        ep_reward, video_path, plot_path = test(action_std, env, policy, i_video)
-        metadata_path = os.path.join(METADATA_DIR, f"video_{i_video + 1}_metadata.json")
-        metadata = {
-            "script": os.path.basename(__file__),
-            "policy_path": os.path.basename(policy_path),
-            "video_index": i_video + 1,
-            "episode_reward": float(ep_reward),
-            "std_init": float(std_init),
-            "artifacts": {
-                "video": os.path.basename(video_path),
-                "plot": os.path.basename(plot_path),
-            },
-        }
-        write_metadata_json(metadata_path, metadata)
-        upload_many_to_hub(
-            [
-                (video_path, f"videos/{os.path.basename(video_path)}"),
-                (plot_path, f"plots/{os.path.basename(plot_path)}"),
-                (metadata_path, f"metadata/{os.path.basename(metadata_path)}"),
-            ]
-        )
-        print(f"Video #{i_video + 1} reward: {ep_reward}")
+        ep_reward = test(action_std, env, policy, i_video)
+        logger.info("[video] Video #%d reward: %s", i_video + 1, ep_reward)
 
 
 if __name__ == "__main__":
