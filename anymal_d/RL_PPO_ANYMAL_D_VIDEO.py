@@ -35,8 +35,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from hf_artifacts import upload_many_to_hub, write_metadata_json
-
 MUJOCO_STEPS = 5
 
 logging.basicConfig(
@@ -63,9 +61,7 @@ def find_project_file(rel_path):
 MODEL_XML = find_project_file(os.path.join("anybotics_anymal_d", "scene.xml"))
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(MODEL_XML), ".."))
 SAVE_DIR = os.path.join(PROJECT_ROOT, "pretrained_models", "anymal_d")
-METADATA_DIR = os.path.join(SAVE_DIR, "metadata")
 os.makedirs(SAVE_DIR, exist_ok=True)
-os.makedirs(METADATA_DIR, exist_ok=True)
 
 
 class Agent(nn.Module):
@@ -186,7 +182,7 @@ def test(action_std, env, policy, num_video, render=False):
         cumulative_reward_list.append(ep_reward)
         counter = counter + 1
 
-    video_path = env.close(num_video + 1, ep_reward)
+    env.close(num_video + 1, ep_reward)
     # (Experiment-tracker video logging is intentionally off in this script.)
 
     # Plotting episode reward
@@ -196,11 +192,10 @@ def test(action_std, env, policy, num_video, render=False):
     plt.xlabel("Time (seconds)")
     plt.ylabel("Reward")
     plt.title("Episode instant and cumulative Reward")
-    plot_path = os.path.join(SAVE_DIR, f"video_reward_{num_video + 1}.png")
-    plt.savefig(plot_path)
+    plt.savefig(os.path.join(SAVE_DIR, f"video_reward_{num_video + 1}.png"))
     plt.close()
 
-    return ep_reward, video_path, plot_path
+    return ep_reward
 
 
 def pick_latest_checkpoint(save_dir=SAVE_DIR):
