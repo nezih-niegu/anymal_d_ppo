@@ -1,0 +1,74 @@
+# eval_config.yaml
+# =================
+# Centralised configuration for evaluate.py.
+#
+# All settings here can be overridden on the command line (CLI flags take
+# precedence over this file).  Pass --config path/to/eval_config.yaml to
+# point evaluate.py at a non-default config.
+
+# ---------------------------------------------------------------------------
+# Rollout settings
+# ---------------------------------------------------------------------------
+num_episodes: 10          # episodes per policy
+seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]   # one seed per episode; len must == num_episodes
+                                          # (or set a single integer to repeat for all)
+
+# ---------------------------------------------------------------------------
+# Environment settings
+# ---------------------------------------------------------------------------
+env:
+  model_xml: null           # null → auto-locate anybotics_anymal_d/scene.xml
+  fall_threshold: 0.35      # z-height below which episode terminates as a fall
+  reward_fn: shaped         # "shaped" (trainer-2 rich reward) | "simple" (trainer-1 raw)
+  episode_duration: 8.0     # seconds of simulated time per episode (set in Env.DURATION)
+
+# ---------------------------------------------------------------------------
+# Metrics to compute and include in output
+# ---------------------------------------------------------------------------
+metrics:
+  - episode_reward          # total undiscounted return per episode
+  - episode_length          # number of policy steps before done
+  - forward_velocity_mean   # mean qvel[0] over the episode
+  - forward_velocity_max    # peak forward velocity
+  - fell                    # bool — did the robot fall before the time limit?
+  - fall_rate               # fraction of episodes that ended in a fall
+
+# ---------------------------------------------------------------------------
+# Output settings
+# ---------------------------------------------------------------------------
+output:
+  format: json              # "json" | "csv"
+  dir: results              # relative to the repo root; created if absent
+  filename: null            # null → auto-named eval_<policy>_<timestamp>.{json|csv}
+  save_videos: false        # save one mp4 per episode (can be slow)
+  video_dir: results/videos
+
+# ---------------------------------------------------------------------------
+# Policy-specific defaults
+# (overridden by --policy and --checkpoint CLI args)
+# ---------------------------------------------------------------------------
+policies:
+  ppo_multivariate:
+    obs_convention: full    # 37-D (qpos+qvel)
+    action_convention: raw  # ctrl = policy output directly
+    deterministic: false
+
+  ppo_normal:
+    obs_convention: noxy    # 35-D (drop world x,y)
+    action_convention: delta  # ctrl = nominal + ACTION_SCALE * tanh(action)
+    deterministic: false
+
+  diffusion:
+    obs_convention: noxy
+    action_convention: delta
+    deterministic: false     # use mean / single denoising pass
+
+  flow_matching:
+    obs_convention: noxy
+    action_convention: delta
+    deterministic: false
+
+  scripted:
+    obs_convention: full    # scripted policy receives full obs (ignores most of it)
+    action_convention: raw
+    deterministic: false
