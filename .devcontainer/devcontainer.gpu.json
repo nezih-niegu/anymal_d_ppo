@@ -1,0 +1,21 @@
+{
+  "name": "ANYmal D PPO — GPU Dev Container",
+  "dockerComposeFile": [
+    "docker-compose.yml",
+    "docker-compose.gpu.yml"
+  ],
+  "service": "anymal-dev",
+  "workspaceFolder": "/home/dev/ws",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-toolsai.jupyter",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "remoteUser": "dev"
+}
