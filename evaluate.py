@@ -72,8 +72,10 @@ def load_config(path: Path) -> dict:
     try:
         import yaml
     except ImportError:
-        print("[warn] PyYAML not installed; using built-in defaults. "
-              "Install with: pip install pyyaml")
+        print(
+            "[warn] PyYAML not installed; using built-in defaults. "
+            "Install with: pip install pyyaml"
+        )
         return {}
     with open(path) as fh:
         return yaml.safe_load(fh) or {}
@@ -140,6 +142,7 @@ def merge_config(cfg: dict, args: argparse.Namespace) -> dict:
 # Per-episode rollout
 # ---------------------------------------------------------------------------
 
+
 def run_episode(
     env: ANYmalEnv,
     policy: BasePolicy,
@@ -157,11 +160,11 @@ def run_episode(
 
     # Waypoint tracking (for flow_matching policy)
     is_waypoint_policy = hasattr(policy, "update_xyz")
-    waypoint_stride    = 50
-    xyz_history        = []
-    waypoints_total    = 0
-    waypoints_reached  = 0
-    WP_THRESHOLD       = 0.3   # metres — waypoint considered reached
+    waypoint_stride = 50
+    xyz_history = []
+    waypoints_total = 0
+    waypoints_reached = 0
+    WP_THRESHOLD = 0.3  # metres — waypoint considered reached
 
     while True:
         # Update xyz buffer for waypoint-conditioned policies
@@ -180,9 +183,9 @@ def run_episode(
         # Check waypoint completion every STRIDE steps
         if is_waypoint_policy and ep_length % waypoint_stride == 0:
             current_xyz = env.data.qpos[0:3].copy()
-            target_idx  = max(0, len(xyz_history) - waypoint_stride)
-            target_xyz  = xyz_history[target_idx]
-            dist        = float(np.linalg.norm(current_xyz[:2] - target_xyz[:2]))
+            target_idx = max(0, len(xyz_history) - waypoint_stride)
+            target_xyz = xyz_history[target_idx]
+            dist = float(np.linalg.norm(current_xyz[:2] - target_xyz[:2]))
             waypoints_total += 1
             if dist < WP_THRESHOLD or current_xyz[0] > target_xyz[0]:
                 waypoints_reached += 1
@@ -193,8 +196,7 @@ def run_episode(
         if done:
             break
 
-    wp_completion = (waypoints_reached / waypoints_total
-                     if waypoints_total > 0 else None)
+    wp_completion = waypoints_reached / waypoints_total if waypoints_total > 0 else None
 
     return {
         "seed": seed,
@@ -203,7 +205,9 @@ def run_episode(
         "forward_velocity_mean": round(float(np.mean(forward_vels)), 4),
         "forward_velocity_max": round(float(np.max(forward_vels)), 4),
         "fell": fell,
-        "waypoint_completion": round(wp_completion, 4) if wp_completion is not None else None,
+        "waypoint_completion": (
+            round(wp_completion, 4) if wp_completion is not None else None
+        ),
     }
 
 
@@ -211,7 +215,10 @@ def run_episode(
 # Output writers
 # ---------------------------------------------------------------------------
 
-def make_output_path(output_dir: str, policy_name: str, fmt: str, filename: str | None) -> Path:
+
+def make_output_path(
+    output_dir: str, policy_name: str, fmt: str, filename: str | None
+) -> Path:
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     if filename:
         return Path(output_dir) / filename
@@ -250,6 +257,7 @@ def write_csv(path: Path, results: dict) -> None:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -323,7 +331,9 @@ def main() -> None:
     policy_cls = POLICY_REGISTRY[args.policy]
     # Pass deterministic kwarg only to policies that accept it
     try:
-        det = args.deterministic if args.deterministic is not None else c["deterministic"]
+        det = (
+            args.deterministic if args.deterministic is not None else c["deterministic"]
+        )
         policy: BasePolicy = policy_cls(deterministic=det)
     except TypeError:
         policy = policy_cls()
@@ -342,9 +352,11 @@ def main() -> None:
     if c["model_xml"]:
         env_kwargs["model_xml"] = c["model_xml"]
 
-    print(f"Building environment  (action={c['action_convention']}, "
-          f"obs={c['obs_convention']}, reward={c['reward_fn']}, "
-          f"fall_threshold={c['fall_threshold']})")
+    print(
+        f"Building environment  (action={c['action_convention']}, "
+        f"obs={c['obs_convention']}, reward={c['reward_fn']}, "
+        f"fall_threshold={c['fall_threshold']})"
+    )
     env = ANYmalEnv(**env_kwargs)
 
     # Sanity-check obs dimensions
@@ -429,8 +441,10 @@ def main() -> None:
 
     print("-" * 60)
     print(f"Summary:")
-    print(f"  reward:   {summary['reward_mean']:.2f} ± {summary['reward_std']:.2f}  "
-          f"(min {summary['reward_min']:.2f}, max {summary['reward_max']:.2f})")
+    print(
+        f"  reward:   {summary['reward_mean']:.2f} ± {summary['reward_std']:.2f}  "
+        f"(min {summary['reward_min']:.2f}, max {summary['reward_max']:.2f})"
+    )
     print(f"  fwd vel:  {summary['forward_velocity_mean']:.3f} m/s (mean)")
     print(f"  fall rate:{summary['fall_rate']:.1%}")
     print(f"  wall time:{elapsed:.1f}s")

@@ -21,20 +21,20 @@ class DemoDataset(Dataset):
 
     def __init__(self, npz_path: str | Path, normalize: bool = True):
         data = np.load(npz_path)
-        self.obs     = torch.from_numpy(data["obs"]).float()      # (N, 35)
+        self.obs = torch.from_numpy(data["obs"]).float()  # (N, 35)
         self.actions = torch.from_numpy(data["actions"]).float()  # (N, 12)
 
         self.normalize = normalize
         if normalize:
             self.obs_mean = self.obs.mean(0)
-            self.obs_std  = self.obs.std(0).clamp(min=1e-6)
+            self.obs_std = self.obs.std(0).clamp(min=1e-6)
             self.act_mean = self.actions.mean(0)
-            self.act_std  = self.actions.std(0).clamp(min=1e-6)
+            self.act_std = self.actions.std(0).clamp(min=1e-6)
         else:
             self.obs_mean = torch.zeros(self.obs.shape[1])
-            self.obs_std  = torch.ones(self.obs.shape[1])
+            self.obs_std = torch.ones(self.obs.shape[1])
             self.act_mean = torch.zeros(self.actions.shape[1])
-            self.act_std  = torch.ones(self.actions.shape[1])
+            self.act_std = torch.ones(self.actions.shape[1])
 
         print(f"Dataset loaded: {len(self)} transitions from {npz_path}")
         print(f"  obs  shape: {self.obs.shape}")
@@ -52,15 +52,25 @@ class DemoDataset(Dataset):
         """Returns normalizer stats for saving with the checkpoint."""
         return {
             "obs_mean": self.obs_mean,
-            "obs_std":  self.obs_std,
+            "obs_std": self.obs_std,
             "act_mean": self.act_mean,
-            "act_std":  self.act_std,
+            "act_std": self.act_std,
         }
 
 
-def make_dataloader(npz_path: str | Path, batch_size: int = 256,
-                    normalize: bool = True, num_workers: int = 2) -> tuple[DataLoader, DemoDataset]:
+def make_dataloader(
+    npz_path: str | Path,
+    batch_size: int = 256,
+    normalize: bool = True,
+    num_workers: int = 2,
+) -> tuple[DataLoader, DemoDataset]:
     dataset = DemoDataset(npz_path, normalize=normalize)
-    loader  = DataLoader(dataset, batch_size=batch_size, shuffle=True,
-                         num_workers=num_workers, pin_memory=True, drop_last=True)
+    loader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=True,
+        drop_last=True,
+    )
     return loader, dataset

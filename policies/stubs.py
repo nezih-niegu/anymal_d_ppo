@@ -26,10 +26,10 @@ import numpy as np
 
 from policies.base import BasePolicy
 
-
 # ---------------------------------------------------------------------------
 # Diffusion Policy stub
 # ---------------------------------------------------------------------------
+
 
 class DiffusionPolicy(BasePolicy):
     """Stub for a diffusion-based policy (e.g. Chi et al. 2023 architecture).
@@ -53,7 +53,7 @@ class DiffusionPolicy(BasePolicy):
     4. Register 'diffusion' in ``evaluate.py``'s POLICY_REGISTRY.
     """
 
-    obs_dim: int = 35   # match trainer-2 observation space
+    obs_dim: int = 35  # match trainer-2 observation space
     act_dim: int = 12
 
     def load(self, checkpoint_path: Union[str, Path]) -> None:
@@ -63,9 +63,7 @@ class DiffusionPolicy(BasePolicy):
         )
 
     def act(self, obs: np.ndarray) -> np.ndarray:
-        raise NotImplementedError(
-            "DiffusionPolicy.act() is not yet implemented."
-        )
+        raise NotImplementedError("DiffusionPolicy.act() is not yet implemented.")
 
     @property
     def name(self) -> str:
@@ -75,6 +73,7 @@ class DiffusionPolicy(BasePolicy):
 # ---------------------------------------------------------------------------
 # Flow Matching Policy stub
 # ---------------------------------------------------------------------------
+
 
 class FlowMatchingPolicy(BasePolicy):
     """Stub for a continuous-normalizing-flow / flow-matching policy.
@@ -107,9 +106,7 @@ class FlowMatchingPolicy(BasePolicy):
         )
 
     def act(self, obs: np.ndarray) -> np.ndarray:
-        raise NotImplementedError(
-            "FlowMatchingPolicy.act() is not yet implemented."
-        )
+        raise NotImplementedError("FlowMatchingPolicy.act() is not yet implemented.")
 
     @property
     def name(self) -> str:
@@ -119,6 +116,7 @@ class FlowMatchingPolicy(BasePolicy):
 # ---------------------------------------------------------------------------
 # Scripted Waypoint Policy stub
 # ---------------------------------------------------------------------------
+
 
 class ScriptedWaypointPolicy(BasePolicy):
     """Stub for a scripted, model-free waypoint-tracking policy.
@@ -152,7 +150,7 @@ class ScriptedWaypointPolicy(BasePolicy):
     5. Register 'scripted' in ``evaluate.py``'s POLICY_REGISTRY.
     """
 
-    obs_dim: int = 37   # can work with full obs; it simply ignores it
+    obs_dim: int = 37  # can work with full obs; it simply ignores it
     act_dim: int = 12
 
     def __init__(self) -> None:

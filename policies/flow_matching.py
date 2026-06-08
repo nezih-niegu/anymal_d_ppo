@@ -8,14 +8,15 @@ from policies.base import BasePolicy
 
 WAYPOINT_STRIDE = 50
 
+
 class FlowMatchingPolicy(BasePolicy):
     obs_dim: int = 35
     act_dim: int = 12
 
     def __init__(self, num_steps: int = 10):
-        self._model       = None
-        self.num_steps    = num_steps
-        self._xyz_buffer  = deque(maxlen=WAYPOINT_STRIDE + 1)
+        self._model = None
+        self.num_steps = num_steps
+        self._xyz_buffer = deque(maxlen=WAYPOINT_STRIDE + 1)
         self._current_xyz = None
 
     def load(self, checkpoint_path: Union[str, Path]) -> None:
@@ -42,7 +43,7 @@ class FlowMatchingPolicy(BasePolicy):
         else:
             waypoint = np.zeros(3, dtype=np.float32)
         obs_t = torch.from_numpy(obs.astype(np.float32))
-        wp_t  = torch.from_numpy(waypoint.astype(np.float32))
+        wp_t = torch.from_numpy(waypoint.astype(np.float32))
         action = self._model.sample(obs_t, wp_t)
         return action.numpy().copy()
 

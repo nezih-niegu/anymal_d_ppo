@@ -34,16 +34,16 @@ from imitation.flow_matching import FlowMatchingPolicy
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset",    default="data/ppo_demos.npz")
-    parser.add_argument("--epochs",     type=int,   default=100)
-    parser.add_argument("--batch-size", type=int,   default=512)
-    parser.add_argument("--lr",         type=float, default=1e-3)
-    parser.add_argument("--hidden-dim", type=int,   default=256)
-    parser.add_argument("--num-layers", type=int,   default=4)
-    parser.add_argument("--num-steps",  type=int,   default=10)
-    parser.add_argument("--val-split",  type=float, default=0.1)
-    parser.add_argument("--out",        default="pretrained_models/flow_matching")
-    parser.add_argument("--seed",       type=int,   default=42)
+    parser.add_argument("--dataset", default="data/ppo_demos.npz")
+    parser.add_argument("--epochs", type=int, default=100)
+    parser.add_argument("--batch-size", type=int, default=512)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--hidden-dim", type=int, default=256)
+    parser.add_argument("--num-layers", type=int, default=4)
+    parser.add_argument("--num-steps", type=int, default=10)
+    parser.add_argument("--val-split", type=float, default=0.1)
+    parser.add_argument("--out", default="pretrained_models/flow_matching")
+    parser.add_argument("--seed", type=int, default=42)
     return parser.parse_args()
 
 
@@ -54,17 +54,29 @@ def main():
     print(f"Device: {device}")
 
     full_dataset = WaypointDemoDataset(args.dataset, normalize=True)
-    n_val   = int(len(full_dataset) * args.val_split)
+    n_val = int(len(full_dataset) * args.val_split)
     n_train = len(full_dataset) - n_val
     train_ds, val_ds = random_split(
-        full_dataset, [n_train, n_val],
-        generator=torch.Generator().manual_seed(args.seed)
+        full_dataset,
+        [n_train, n_val],
+        generator=torch.Generator().manual_seed(args.seed),
     )
 
-    train_loader = DataLoader(train_ds, batch_size=args.batch_size,
-                              shuffle=True,  num_workers=2, pin_memory=True, drop_last=True)
-    val_loader   = DataLoader(val_ds,   batch_size=args.batch_size,
-                              shuffle=False, num_workers=2, pin_memory=True)
+    train_loader = DataLoader(
+        train_ds,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=2,
+        pin_memory=True,
+        drop_last=True,
+    )
+    val_loader = DataLoader(
+        val_ds,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=2,
+        pin_memory=True,
+    )
 
     print(f"Train: {n_train} | Val: {n_val}")
 
@@ -90,7 +102,7 @@ def main():
 
     best_val_loss = float("inf")
     log = {"train_loss": [], "val_loss": []}
-    t0  = time.perf_counter()
+    t0 = time.perf_counter()
 
     print(f"\nTraining for {args.epochs} epochs...")
     print("-" * 60)
@@ -115,7 +127,7 @@ def main():
                 val_losses.append(model.loss(obs, act, wp).item())
 
         train_loss = np.mean(train_losses)
-        val_loss   = np.mean(val_losses)
+        val_loss = np.mean(val_losses)
         scheduler.step()
 
         log["train_loss"].append(round(train_loss, 6))
@@ -126,9 +138,11 @@ def main():
             torch.save(model, out_dir / "best_flow_policy.pt")
 
         if epoch % 10 == 0 or epoch == 1:
-            print(f"  Epoch {epoch:>4}/{args.epochs}  "
-                  f"train={train_loss:.5f}  val={val_loss:.5f}  "
-                  f"best={best_val_loss:.5f}  time={time.perf_counter()-t0:.0f}s")
+            print(
+                f"  Epoch {epoch:>4}/{args.epochs}  "
+                f"train={train_loss:.5f}  val={val_loss:.5f}  "
+                f"best={best_val_loss:.5f}  time={time.perf_counter()-t0:.0f}s"
+            )
 
     torch.save(model, out_dir / "last_flow_policy.pt")
     with open(out_dir / "training_log.json", "w") as f:

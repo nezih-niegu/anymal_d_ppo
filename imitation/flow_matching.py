@@ -33,8 +33,15 @@ class SinusoidalTimeEmb(nn.Module):
 class VelocityNet(nn.Module):
     """Predicts flow velocity conditioned on obs + waypoint."""
 
-    def __init__(self, obs_dim=35, act_dim=12, wp_dim=3,
-                 hidden_dim=256, num_layers=4, time_emb_dim=32):
+    def __init__(
+        self,
+        obs_dim=35,
+        act_dim=12,
+        wp_dim=3,
+        hidden_dim=256,
+        num_layers=4,
+        time_emb_dim=32,
+    ):
         super().__init__()
         self.time_emb = SinusoidalTimeEmb(time_emb_dim)
 
@@ -49,58 +56,66 @@ class VelocityNet(nn.Module):
 
     def forward(self, x_t, t, obs, waypoint):
         t_emb = self.time_emb(t)
-        inp   = torch.cat([x_t, t_emb, obs, waypoint], dim=-1)
+        inp = torch.cat([x_t, t_emb, obs, waypoint], dim=-1)
         return self.net(inp)
 
 
 class FlowMatchingPolicy(nn.Module):
     """Waypoint-conditioned CFM policy."""
 
-    def __init__(self, obs_dim=35, act_dim=12, wp_dim=3,
-                 hidden_dim=256, num_layers=4, time_emb_dim=32, num_steps=10):
+    def __init__(
+        self,
+        obs_dim=35,
+        act_dim=12,
+        wp_dim=3,
+        hidden_dim=256,
+        num_layers=4,
+        time_emb_dim=32,
+        num_steps=10,
+    ):
         super().__init__()
-        self.act_dim   = act_dim
+        self.act_dim = act_dim
         self.num_steps = num_steps
 
-        self.net = VelocityNet(obs_dim, act_dim, wp_dim,
-                               hidden_dim, num_layers, time_emb_dim)
+        self.net = VelocityNet(
+            obs_dim, act_dim, wp_dim, hidden_dim, num_layers, time_emb_dim
+        )
 
         # Normalizer buffers
         self.register_buffer("obs_mean", torch.zeros(obs_dim))
-        self.register_buffer("obs_std",  torch.ones(obs_dim))
+        self.register_buffer("obs_std", torch.ones(obs_dim))
         self.register_buffer("act_mean", torch.zeros(act_dim))
-        self.register_buffer("act_std",  torch.ones(act_dim))
-        self.register_buffer("wp_mean",  torch.zeros(wp_dim))
-        self.register_buffer("wp_std",   torch.ones(wp_dim))
+        self.register_buffer("act_std", torch.ones(act_dim))
+        self.register_buffer("wp_mean", torch.zeros(wp_dim))
+        self.register_buffer("wp_std", torch.ones(wp_dim))
 
     def loss(self, obs, x_1, waypoint):
         """CFM OT loss with waypoint conditioning."""
-        B      = obs.shape[0]
+        B = obs.shape[0]
         device = obs.device
-        x_0    = torch.randn_like(x_1)
-        t      = torch.rand(B, device=device)
-        t_b    = t.view(B, 1)
-        x_t    = (1.0 - t_b) * x_0 + t_b * x_1
-        u_t    = x_1 - x_0
-        v_t    = self.net(x_t, t, obs, waypoint)
+        x_0 = torch.randn_like(x_1)
+        t = torch.rand(B, device=device)
+        t_b = t.view(B, 1)
+        x_t = (1.0 - t_b) * x_0 + t_b * x_1
+        u_t = x_1 - x_0
+        v_t = self.net(x_t, t, obs, waypoint)
         return nn.functional.mse_loss(v_t, u_t)
 
     @torch.no_grad()
-    def sample(self, obs_raw: torch.Tensor,
-               waypoint_raw: torch.Tensor) -> torch.Tensor:
+    def sample(self, obs_raw: torch.Tensor, waypoint_raw: torch.Tensor) -> torch.Tensor:
         """Integrate ODE from noise to action given obs and waypoint."""
         squeeze = obs_raw.dim() == 1
         if squeeze:
-            obs_raw      = obs_raw.unsqueeze(0)
+            obs_raw = obs_raw.unsqueeze(0)
             waypoint_raw = waypoint_raw.unsqueeze(0)
 
-        obs_norm = (obs_raw      - self.obs_mean) / self.obs_std
-        wp_norm  = (waypoint_raw - self.wp_mean)  / self.wp_std
+        obs_norm = (obs_raw - self.obs_mean) / self.obs_std
+        wp_norm = (waypoint_raw - self.wp_mean) / self.wp_std
 
-        B      = obs_norm.shape[0]
+        B = obs_norm.shape[0]
         device = obs_norm.device
-        x      = torch.randn(B, self.act_dim, device=device)
-        dt     = 1.0 / self.num_steps
+        x = torch.randn(B, self.act_dim, device=device)
+        dt = 1.0 / self.num_steps
 
         for i in range(self.num_steps):
             t = torch.full((B,), i * dt, device=device)

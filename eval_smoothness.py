@@ -32,6 +32,7 @@ import sys
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -42,6 +43,7 @@ sys.path.insert(0, str(Path(__file__).parent / "anymal_d"))
 
 import RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN_RENDERING as _trainer
 import __main__
+
 __main__.Agent = _trainer.Agent
 
 from policies import POLICY_REGISTRY
@@ -50,13 +52,13 @@ from envs.anymal_env import ANYmalEnv
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--policy",      required=True)
-    parser.add_argument("--checkpoint",  required=True)
-    parser.add_argument("--policy2",     required=True)
+    parser.add_argument("--policy", required=True)
+    parser.add_argument("--checkpoint", required=True)
+    parser.add_argument("--policy2", required=True)
     parser.add_argument("--checkpoint2", required=True)
     parser.add_argument("--num-episodes", type=int, default=10)
-    parser.add_argument("--seed",         type=int, default=0)
-    parser.add_argument("--out",          default="results/smoothness")
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--out", default="results/smoothness")
     return parser.parse_args()
 
 
@@ -75,24 +77,24 @@ def run_smoothness_episode(env, policy, seed):
     actions = np.array(actions)  # (T, 12)
 
     # Action deltas
-    deltas = np.diff(actions, axis=0)           # (T-1, 12)
-    smoothness  = float(np.mean(np.linalg.norm(deltas, axis=1)))
-    energy      = float(np.mean(np.sum(actions**2, axis=1)))
+    deltas = np.diff(actions, axis=0)  # (T-1, 12)
+    smoothness = float(np.mean(np.linalg.norm(deltas, axis=1)))
+    energy = float(np.mean(np.sum(actions**2, axis=1)))
 
     # Jerk (second difference)
     if len(actions) > 2:
-        jerk = np.diff(actions, n=2, axis=0)   # (T-2, 12)
+        jerk = np.diff(actions, n=2, axis=0)  # (T-2, 12)
         jerk_val = float(np.mean(np.linalg.norm(jerk, axis=1)))
     else:
         jerk_val = 0.0
 
     return {
-        "smoothness":  smoothness,
-        "energy":      energy,
-        "jerk":        jerk_val,
-        "ep_length":   len(actions),
+        "smoothness": smoothness,
+        "energy": energy,
+        "jerk": jerk_val,
+        "ep_length": len(actions),
         "action_mean": float(np.mean(np.abs(actions))),
-        "action_std":  float(np.std(actions)),
+        "action_std": float(np.std(actions)),
     }
 
 
@@ -109,7 +111,7 @@ def evaluate_policy(name, checkpoint, num_episodes, seed):
 
     # Pick env convention based on policy
     if name == "ppo_multivariate":
-        env = ANYmalEnv(action_convention="raw",   obs_convention="full")
+        env = ANYmalEnv(action_convention="raw", obs_convention="full")
     else:
         env = ANYmalEnv(action_convention="delta", obs_convention="noxy")
 
@@ -117,21 +119,23 @@ def evaluate_policy(name, checkpoint, num_episodes, seed):
     for ep in range(num_episodes):
         r = run_smoothness_episode(env, policy, seed=seed + ep)
         results.append(r)
-        print(f"  [{name}] Ep {ep+1:>2}/{num_episodes}  "
-              f"smoothness={r['smoothness']:.4f}  "
-              f"energy={r['energy']:.4f}  "
-              f"jerk={r['jerk']:.4f}")
+        print(
+            f"  [{name}] Ep {ep+1:>2}/{num_episodes}  "
+            f"smoothness={r['smoothness']:.4f}  "
+            f"energy={r['energy']:.4f}  "
+            f"jerk={r['jerk']:.4f}"
+        )
 
     summary = {
-        "policy":           name,
-        "checkpoint":       checkpoint,
-        "smoothness_mean":  round(float(np.mean([r["smoothness"] for r in results])), 4),
-        "smoothness_std":   round(float(np.std ([r["smoothness"] for r in results])), 4),
-        "energy_mean":      round(float(np.mean([r["energy"]     for r in results])), 4),
-        "energy_std":       round(float(np.std ([r["energy"]     for r in results])), 4),
-        "jerk_mean":        round(float(np.mean([r["jerk"]       for r in results])), 4),
-        "jerk_std":         round(float(np.std ([r["jerk"]       for r in results])), 4),
-        "episodes":         results,
+        "policy": name,
+        "checkpoint": checkpoint,
+        "smoothness_mean": round(float(np.mean([r["smoothness"] for r in results])), 4),
+        "smoothness_std": round(float(np.std([r["smoothness"] for r in results])), 4),
+        "energy_mean": round(float(np.mean([r["energy"] for r in results])), 4),
+        "energy_std": round(float(np.std([r["energy"] for r in results])), 4),
+        "jerk_mean": round(float(np.mean([r["jerk"] for r in results])), 4),
+        "jerk_std": round(float(np.std([r["jerk"] for r in results])), 4),
+        "episodes": results,
     }
     return summary
 
@@ -142,7 +146,7 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\nEvaluating {args.policy}...")
-    s1 = evaluate_policy(args.policy,  args.checkpoint,  args.num_episodes, args.seed)
+    s1 = evaluate_policy(args.policy, args.checkpoint, args.num_episodes, args.seed)
 
     print(f"\nEvaluating {args.policy2}...")
     s2 = evaluate_policy(args.policy2, args.checkpoint2, args.num_episodes, args.seed)
@@ -150,13 +154,13 @@ def main():
     # ------------------------------------------------------------------
     # Print comparison table
     # ------------------------------------------------------------------
-    print("\n" + "="*58)
+    print("\n" + "=" * 58)
     print(f"{'Metric':<25} {args.policy:>15} {args.policy2:>15}")
-    print("="*58)
+    print("=" * 58)
     for key in ["smoothness_mean", "energy_mean", "jerk_mean"]:
         label = key.replace("_mean", "").capitalize()
         print(f"{label:<25} {s1[key]:>15.4f} {s2[key]:>15.4f}")
-    print("="*58)
+    print("=" * 58)
 
     # Verdict
     if s1["smoothness_mean"] < s2["smoothness_mean"]:
@@ -175,12 +179,14 @@ def main():
     # Plot smoothness per episode
     # ------------------------------------------------------------------
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    fig.suptitle("Control Smoothness — PPO vs Flow Matching", fontsize=13, fontweight="bold")
+    fig.suptitle(
+        "Control Smoothness — PPO vs Flow Matching", fontsize=13, fontweight="bold"
+    )
 
     metrics_to_plot = [
         ("smoothness", "Action Delta (lower=smoother)"),
-        ("energy",     "Energy Proxy (lower=less effort)"),
-        ("jerk",       "Jerk Proxy (lower=smoother accel)"),
+        ("energy", "Energy Proxy (lower=less effort)"),
+        ("jerk", "Jerk Proxy (lower=smoother accel)"),
     ]
 
     for ax, (key, ylabel) in zip(axes, metrics_to_plot):
@@ -188,7 +194,7 @@ def main():
         v2 = [r[key] for r in s2["episodes"]]
         eps = range(1, len(v1) + 1)
 
-        ax.plot(eps, v1, "o-", color="#4C72B0", label=args.policy,  linewidth=2)
+        ax.plot(eps, v1, "o-", color="#4C72B0", label=args.policy, linewidth=2)
         ax.plot(eps, v2, "s-", color="#DD8452", label=args.policy2, linewidth=2)
         ax.axhline(np.mean(v1), color="#4C72B0", linestyle="--", linewidth=1)
         ax.axhline(np.mean(v2), color="#DD8452", linestyle="--", linewidth=1)

@@ -52,10 +52,10 @@ from typing import Literal, Tuple
 import mujoco
 import numpy as np
 
-
 # ---------------------------------------------------------------------------
 # Locate scene.xml robustly (same logic as the trainers)
 # ---------------------------------------------------------------------------
+
 
 def _find_project_file(rel_path: str) -> str:
     seeds = [os.path.dirname(os.path.abspath(__file__)), os.getcwd()]
@@ -76,7 +76,7 @@ ACTION_SCALE: float = 0.4
 N_ACT: int = 12
 MUJOCO_STEPS: int = 5
 FRAMERATE: int = 60
-EPISODE_DURATION: float = 8.0   # seconds
+EPISODE_DURATION: float = 8.0  # seconds
 TIMESTEP: float = 0.002
 
 
@@ -215,9 +215,9 @@ class ANYmalEnv:
         if height < self.fall_threshold:
             self.done = True
             if self.reward_fn == "shaped":
-                reward_acc -= 5.0           # soft fall penalty (trainer-2)
+                reward_acc -= 5.0  # soft fall penalty (trainer-2)
             else:
-                reward_acc -= 100.0         # hard fall penalty (trainer-1)
+                reward_acc -= 100.0  # hard fall penalty (trainer-1)
 
         return self._obs(), reward_acc, self.done
 
@@ -240,10 +240,10 @@ class ANYmalEnv:
         height_reward = -2.0 * (height - self.target_height) ** 2
 
         qw = float(self.data.qpos[3])
-        upright_reward = 0.5 * qw ** 2
+        upright_reward = 0.5 * qw**2
 
         alive_bonus = 0.5
-        action_cost = -0.002 * float(np.sum(bounded_action ** 2))
+        action_cost = -0.002 * float(np.sum(bounded_action**2))
         smooth_cost = -0.002 * float(np.sum((bounded_action - self._last_action) ** 2))
         joint_vel_cost = -0.0001 * float(np.sum(self.data.qvel[6:] ** 2))
 
@@ -262,6 +262,8 @@ class ANYmalEnv:
         try:
             import mediapy as media
         except ImportError as exc:
-            raise ImportError("Install mediapy to save videos: pip install mediapy") from exc
+            raise ImportError(
+                "Install mediapy to save videos: pip install mediapy"
+            ) from exc
         media.write_video(str(path), self.frames, fps=fps)
         return str(path)

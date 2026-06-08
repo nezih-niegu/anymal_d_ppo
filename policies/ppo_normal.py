@@ -46,9 +46,11 @@ from typing import Union
 import numpy as np
 import torch
 import sys
+
 sys.path.insert(0, "anymal_d")
 import RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN_RENDERING as _trainer
 import __main__
+
 __main__.Agent = _trainer.Agent
 
 from policies.base import BasePolicy
@@ -57,7 +59,7 @@ from policies.base import BasePolicy
 class PPONormalPolicy(BasePolicy):
     """Evaluator wrapper for trainer-2 (Normal dist, learnable log_std, delta actions)."""
 
-    obs_dim: int = 35   # qpos[2:] (17) + qvel (18)
+    obs_dim: int = 35  # qpos[2:] (17) + qvel (18)
     act_dim: int = 12
 
     def __init__(self, deterministic: bool = True):
@@ -113,11 +115,11 @@ class PPONormalPolicy(BasePolicy):
 
         with torch.no_grad():
             if self.deterministic:
-                mean, _ = self._model(obs_t)   # (1, 12)
+                mean, _ = self._model(obs_t)  # (1, 12)
                 action = mean
             else:
                 dist, _ = self._model.dist(obs_t)
-                action = dist.sample()         # (1, 12)
+                action = dist.sample()  # (1, 12)
 
         return action.squeeze(0).numpy().copy()
 

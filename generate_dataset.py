@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent / "anymal_d"))
 
 import RL_PPO_ANYMAL_D_SWEEP_OR_TRAIN_RENDERING as _trainer
 import __main__
+
 __main__.Agent = _trainer.Agent
 
 from policies.ppo_normal import PPONormalPolicy
@@ -80,7 +81,9 @@ def main():
         if steps < args.min_steps:
             discarded += 1
             if ep % 50 == 0:
-                print(f"  Ep {ep+1:>4}/{args.num_episodes}  steps={steps:>4}  DISCARDED")
+                print(
+                    f"  Ep {ep+1:>4}/{args.num_episodes}  steps={steps:>4}  DISCARDED"
+                )
             continue
 
         all_obs.extend(ep_obs)
@@ -91,8 +94,10 @@ def main():
         kept += 1
 
         if ep % 50 == 0:
-            print(f"  Ep {ep+1:>4}/{args.num_episodes}  steps={steps:>4}  "
-                  f"reward={sum(ep_rewards):.1f}  kept={kept}")
+            print(
+                f"  Ep {ep+1:>4}/{args.num_episodes}  steps={steps:>4}  "
+                f"reward={sum(ep_rewards):.1f}  kept={kept}"
+            )
 
     elapsed = time.perf_counter() - t0
     print("-" * 60)
@@ -105,10 +110,10 @@ def main():
 
     np.savez_compressed(
         out_path,
-        obs=np.array(all_obs,     dtype=np.float32),
+        obs=np.array(all_obs, dtype=np.float32),
         actions=np.array(all_actions, dtype=np.float32),
-        xyz=np.array(all_xyz,     dtype=np.float32),
-        ep_ids=np.array(all_ep_ids,  dtype=np.int32),
+        xyz=np.array(all_xyz, dtype=np.float32),
+        ep_ids=np.array(all_ep_ids, dtype=np.int32),
         rewards=np.array(all_rewards, dtype=np.float32),
     )
     print(f"Saved dataset to {out_path}  ({out_path.stat().st_size / 1e6:.1f} MB)")

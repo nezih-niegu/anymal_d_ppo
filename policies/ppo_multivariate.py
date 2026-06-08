@@ -55,10 +55,10 @@ class PPOMultivariatePolicy(BasePolicy):
 
     # HAA asymmetric remapping table: (joint_idx, scale, bias)
     _HAA_REMAP = [
-        (0, 0.6, -0.1),   # LF_HAA
-        (3, 0.6, +0.1),   # RF_HAA
-        (6, 0.6, -0.1),   # LH_HAA
-        (9, 0.6, +0.1),   # RH_HAA
+        (0, 0.6, -0.1),  # LF_HAA
+        (3, 0.6, +0.1),  # RF_HAA
+        (6, 0.6, -0.1),  # LH_HAA
+        (9, 0.6, +0.1),  # RH_HAA
     ]
 
     def __init__(self, deterministic: bool = True):
@@ -109,8 +109,8 @@ class PPOMultivariatePolicy(BasePolicy):
         obs_t = torch.from_numpy(obs.astype(np.float32)).unsqueeze(0)
 
         with torch.no_grad():
-            actor_out, _ = self._model(obs_t)   # (1, 12)
-            action = torch.tanh(actor_out)      # squash to (−1, 1)
+            actor_out, _ = self._model(obs_t)  # (1, 12)
+            action = torch.tanh(actor_out)  # squash to (−1, 1)
 
         action_np = action.squeeze(0).numpy().copy()
 

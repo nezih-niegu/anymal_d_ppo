@@ -35,7 +35,7 @@ class BasePolicy(ABC):
     """Abstract policy wrapper for ANYmal D evaluation."""
 
     # Subclasses should set these as class attributes or in __init__.
-    obs_dim: int = 0   # expected observation dimensionality (for documentation)
+    obs_dim: int = 0  # expected observation dimensionality (for documentation)
     act_dim: int = 12  # always 12 for ANYmal D
 
     # ------------------------------------------------------------------
@@ -104,4 +104,3 @@ class BasePolicy(ABC):
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"{self.name}(obs_dim={self.obs_dim}, act_dim={self.act_dim})"
-
