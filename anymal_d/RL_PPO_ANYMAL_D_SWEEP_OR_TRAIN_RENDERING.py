@@ -550,6 +550,8 @@ def train_or_sweep(
     if num_episodes is not None:
         hparams["num_episodes"] = num_episodes
 
+    if not os.environ.get("TRACKIO_SPACE_ID"):
+        os.environ.pop("TRACKIO_SPACE_ID", None)
     run = wandb.init(
         project=PROJECT,
         name=run_name,
@@ -745,17 +747,20 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if args.mode == "train":
-        train_or_sweep(is_sweep=False, live=args.live)
-    elif args.mode == "sweep":
-        run_sweep(
-            count=args.sweep_count,
-            episodes_per_trial=args.sweep_episodes,
-            live=args.live,
-        )
-    elif args.mode == "render":
-        make_video(
-            num_videos=args.num_videos,
-            policy_path=args.policy,
-            fall_threshold=args.fall_threshold,
-        )
+    try:
+        if args.mode == "train":
+            train_or_sweep(is_sweep=False, live=args.live)
+        elif args.mode == "sweep":
+            run_sweep(
+                count=args.sweep_count,
+                episodes_per_trial=args.sweep_episodes,
+                live=args.live,
+            )
+        elif args.mode == "render":
+            make_video(
+                num_videos=args.num_videos,
+                policy_path=args.policy,
+                fall_threshold=args.fall_threshold,
+            )
+    except KeyboardInterrupt:
+        print("\nInterrupted.")

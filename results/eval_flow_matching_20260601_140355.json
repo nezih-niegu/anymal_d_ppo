@@ -1,0 +1,355 @@
+{
+  "summary": {
+    "policy": "flow_matching",
+    "checkpoint": "pretrained_models/flow_matching/best_flow_policy.pt",
+    "num_episodes": 30,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "reward_mean": 1729.7994,
+    "reward_std": 468.9721,
+    "reward_min": 743.7582,
+    "reward_max": 2173.7513,
+    "episode_length_mean": 698.67,
+    "forward_velocity_mean": 1.2919,
+    "fall_rate": 0.4,
+    "eval_wall_time_s": 229.99,
+    "env": {
+      "action_convention": "delta",
+      "obs_convention": "noxy",
+      "reward_fn": "shaped",
+      "fall_threshold": 0.35
+    }
+  },
+  "episodes": [
+    {
+      "seed": 0,
+      "episode_reward": 2053.1016,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.2568,
+      "forward_velocity_max": 2.0932,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 1
+    },
+    {
+      "seed": 1,
+      "episode_reward": 2134.243,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4708,
+      "forward_velocity_max": 2.1209,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 2
+    },
+    {
+      "seed": 2,
+      "episode_reward": 2096.9979,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.3685,
+      "forward_velocity_max": 2.1784,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 3
+    },
+    {
+      "seed": 3,
+      "episode_reward": 2147.1104,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.5139,
+      "forward_velocity_max": 2.1803,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 4
+    },
+    {
+      "seed": 4,
+      "episode_reward": 1412.0169,
+      "episode_length": 608,
+      "forward_velocity_mean": 1.221,
+      "forward_velocity_max": 2.2206,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 5
+    },
+    {
+      "seed": 5,
+      "episode_reward": 2081.1032,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4048,
+      "forward_velocity_max": 2.2737,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 6
+    },
+    {
+      "seed": 6,
+      "episode_reward": 1618.4992,
+      "episode_length": 726,
+      "forward_velocity_mean": 1.0936,
+      "forward_velocity_max": 2.3473,
+      "fell": true,
+      "waypoint_completion": 0.9286,
+      "episode": 7
+    },
+    {
+      "seed": 7,
+      "episode_reward": 743.7582,
+      "episode_length": 284,
+      "forward_velocity_mean": 1.5239,
+      "forward_velocity_max": 2.1389,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 8
+    },
+    {
+      "seed": 8,
+      "episode_reward": 1108.4186,
+      "episode_length": 522,
+      "forward_velocity_mean": 0.9929,
+      "forward_velocity_max": 2.0354,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 9
+    },
+    {
+      "seed": 9,
+      "episode_reward": 2171.4613,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.547,
+      "forward_velocity_max": 2.1272,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 10
+    },
+    {
+      "seed": 10,
+      "episode_reward": 2158.8015,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.5547,
+      "forward_velocity_max": 2.2004,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 11
+    },
+    {
+      "seed": 11,
+      "episode_reward": 1181.6521,
+      "episode_length": 801,
+      "forward_velocity_mean": 0.5967,
+      "forward_velocity_max": 2.1097,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 12
+    },
+    {
+      "seed": 12,
+      "episode_reward": 1757.5038,
+      "episode_length": 756,
+      "forward_velocity_mean": 1.1604,
+      "forward_velocity_max": 2.1015,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 13
+    },
+    {
+      "seed": 13,
+      "episode_reward": 1167.0992,
+      "episode_length": 528,
+      "forward_velocity_mean": 1.1067,
+      "forward_velocity_max": 2.0421,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 14
+    },
+    {
+      "seed": 14,
+      "episode_reward": 1067.602,
+      "episode_length": 502,
+      "forward_velocity_mean": 1.0047,
+      "forward_velocity_max": 1.8013,
+      "fell": true,
+      "waypoint_completion": 0.9,
+      "episode": 15
+    },
+    {
+      "seed": 15,
+      "episode_reward": 761.8977,
+      "episode_length": 385,
+      "forward_velocity_mean": 0.9151,
+      "forward_velocity_max": 1.9518,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 16
+    },
+    {
+      "seed": 16,
+      "episode_reward": 2140.6865,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4669,
+      "forward_velocity_max": 2.1455,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 17
+    },
+    {
+      "seed": 17,
+      "episode_reward": 1647.5466,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.014,
+      "forward_velocity_max": 1.9368,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 18
+    },
+    {
+      "seed": 18,
+      "episode_reward": 1442.4257,
+      "episode_length": 545,
+      "forward_velocity_mean": 1.4562,
+      "forward_velocity_max": 2.0545,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 19
+    },
+    {
+      "seed": 19,
+      "episode_reward": 2173.7513,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.5755,
+      "forward_velocity_max": 2.0785,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 20
+    },
+    {
+      "seed": 20,
+      "episode_reward": 2114.1842,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4609,
+      "forward_velocity_max": 2.1661,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 21
+    },
+    {
+      "seed": 21,
+      "episode_reward": 2141.6,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.459,
+      "forward_velocity_max": 2.0489,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 22
+    },
+    {
+      "seed": 22,
+      "episode_reward": 2128.2003,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4652,
+      "forward_velocity_max": 2.3464,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 23
+    },
+    {
+      "seed": 23,
+      "episode_reward": 1960.788,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.1868,
+      "forward_velocity_max": 2.2652,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 24
+    },
+    {
+      "seed": 24,
+      "episode_reward": 1257.0982,
+      "episode_length": 532,
+      "forward_velocity_mean": 1.1919,
+      "forward_velocity_max": 1.9497,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 25
+    },
+    {
+      "seed": 25,
+      "episode_reward": 2113.949,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.3911,
+      "forward_velocity_max": 1.9611,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 26
+    },
+    {
+      "seed": 26,
+      "episode_reward": 2108.9106,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.3784,
+      "forward_velocity_max": 2.0174,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 27
+    },
+    {
+      "seed": 27,
+      "episode_reward": 1105.8592,
+      "episode_length": 474,
+      "forward_velocity_mean": 1.1264,
+      "forward_velocity_max": 1.9336,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 28
+    },
+    {
+      "seed": 28,
+      "episode_reward": 1763.4205,
+      "episode_length": 680,
+      "forward_velocity_mean": 1.4178,
+      "forward_velocity_max": 2.1963,
+      "fell": true,
+      "waypoint_completion": 1.0,
+      "episode": 29
+    },
+    {
+      "seed": 29,
+      "episode_reward": 2134.2963,
+      "episode_length": 801,
+      "forward_velocity_mean": 1.4369,
+      "forward_velocity_max": 1.9619,
+      "fell": false,
+      "waypoint_completion": 1.0,
+      "episode": 30
+    }
+  ]
+}

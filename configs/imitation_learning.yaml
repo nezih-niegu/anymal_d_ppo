@@ -1,0 +1,30 @@
+# Imitation Learning Configuration — Behavior Cloning for ANYmal D
+
+dataset:
+  path: datasets/anymal_d_demos.npz
+  n_episodes: 20
+  episode_steps: 200
+
+model:
+  obs_dim: 37
+  act_dim: 12
+  hidden_dim: 256
+  n_layers: 3
+
+training:
+  epochs: 50
+  batch_size: 256
+  learning_rate: 0.0003
+  val_split: 0.1
+  checkpoint_freq: 10
+  device: cpu
+
+ppo_demo:
+  n_episodes: 20
+  episode_steps: 200
+  checkpoint_path: pretrained_models/anymal_d/ppo_checkpoint.pt
+
+output:
+  checkpoint_dir: pretrained_models/anymal_d/bc
+  results_dir: results/imitation_learning
+  log_dir: logs/imitation_learning
