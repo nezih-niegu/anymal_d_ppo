@@ -1,0 +1,186 @@
+{
+  "policy1": {
+    "policy": "ppo_normal",
+    "checkpoint": "pretrained_models/anymal_d/brave-forest-1_5931_Reward-1805.2_policy.pt",
+    "smoothness_mean": 15.377,
+    "smoothness_std": 0.2825,
+    "energy_mean": 327.2032,
+    "energy_std": 31.1638,
+    "jerk_mean": 26.3781,
+    "jerk_std": 0.479,
+    "episodes": [
+      {
+        "smoothness": 15.361581802368164,
+        "energy": 354.1070556640625,
+        "jerk": 26.351078033447266,
+        "ep_length": 801,
+        "action_mean": 4.31920051574707,
+        "action_std": 5.196596622467041
+      },
+      {
+        "smoothness": 15.321552276611328,
+        "energy": 342.4768981933594,
+        "jerk": 26.08426856994629,
+        "ep_length": 801,
+        "action_mean": 4.227042198181152,
+        "action_std": 5.152595520019531
+      },
+      {
+        "smoothness": 14.729981422424316,
+        "energy": 327.8984069824219,
+        "jerk": 25.341482162475586,
+        "ep_length": 100,
+        "action_mean": 4.140187740325928,
+        "action_std": 5.218955993652344
+      },
+      {
+        "smoothness": 15.24228286743164,
+        "energy": 268.8088684082031,
+        "jerk": 26.2805118560791,
+        "ep_length": 801,
+        "action_mean": 3.761335611343384,
+        "action_std": 4.73239803314209
+      },
+      {
+        "smoothness": 15.504020690917969,
+        "energy": 346.8440246582031,
+        "jerk": 26.488313674926758,
+        "ep_length": 801,
+        "action_mean": 4.270280361175537,
+        "action_std": 5.158298492431641
+      },
+      {
+        "smoothness": 15.467827796936035,
+        "energy": 269.7677001953125,
+        "jerk": 26.713272094726562,
+        "ep_length": 309,
+        "action_mean": 3.7478878498077393,
+        "action_std": 4.74128532409668
+      },
+      {
+        "smoothness": 15.187480926513672,
+        "energy": 321.75341796875,
+        "jerk": 25.986276626586914,
+        "ep_length": 801,
+        "action_mean": 4.092580318450928,
+        "action_std": 5.032126426696777
+      },
+      {
+        "smoothness": 15.842279434204102,
+        "energy": 357.7596740722656,
+        "jerk": 27.182397842407227,
+        "ep_length": 801,
+        "action_mean": 4.317018508911133,
+        "action_std": 5.250361919403076
+      },
+      {
+        "smoothness": 15.647957801818848,
+        "energy": 353.52386474609375,
+        "jerk": 26.77544403076172,
+        "ep_length": 801,
+        "action_mean": 4.305755615234375,
+        "action_std": 5.228703498840332
+      },
+      {
+        "smoothness": 15.465486526489258,
+        "energy": 329.092529296875,
+        "jerk": 26.57813262939453,
+        "ep_length": 178,
+        "action_mean": 4.1706647872924805,
+        "action_std": 5.109781742095947
+      }
+    ]
+  },
+  "policy2": {
+    "policy": "flow_matching",
+    "checkpoint": "pretrained_models/flow_matching/best_flow_policy.pt",
+    "smoothness_mean": 13.7433,
+    "smoothness_std": 0.2166,
+    "energy_mean": 291.8775,
+    "energy_std": 36.8207,
+    "jerk_mean": 23.6414,
+    "jerk_std": 0.3932,
+    "episodes": [
+      {
+        "smoothness": 13.844161987304688,
+        "energy": 293.10601806640625,
+        "jerk": 23.76650047302246,
+        "ep_length": 509,
+        "action_mean": 3.9257147312164307,
+        "action_std": 4.832907676696777
+      },
+      {
+        "smoothness": 13.858602523803711,
+        "energy": 325.1128845214844,
+        "jerk": 23.648412704467773,
+        "ep_length": 801,
+        "action_mean": 4.106476783752441,
+        "action_std": 5.0175371170043945
+      },
+      {
+        "smoothness": 13.613921165466309,
+        "energy": 322.04144287109375,
+        "jerk": 23.310028076171875,
+        "ep_length": 272,
+        "action_mean": 4.119750499725342,
+        "action_std": 5.007291793823242
+      },
+      {
+        "smoothness": 14.303437232971191,
+        "energy": 330.5101623535156,
+        "jerk": 24.732547760009766,
+        "ep_length": 117,
+        "action_mean": 4.137992858886719,
+        "action_std": 5.087920665740967
+      },
+      {
+        "smoothness": 13.467856407165527,
+        "energy": 319.3370361328125,
+        "jerk": 23.30909538269043,
+        "ep_length": 360,
+        "action_mean": 4.0913214683532715,
+        "action_std": 5.030300140380859
+      },
+      {
+        "smoothness": 13.658729553222656,
+        "energy": 225.07061767578125,
+        "jerk": 23.509777069091797,
+        "ep_length": 242,
+        "action_mean": 3.3851873874664307,
+        "action_std": 4.299344539642334
+      },
+      {
+        "smoothness": 13.590574264526367,
+        "energy": 225.2835235595703,
+        "jerk": 23.538558959960938,
+        "ep_length": 550,
+        "action_mean": 3.4459660053253174,
+        "action_std": 4.332791328430176
+      },
+      {
+        "smoothness": 13.7094144821167,
+        "energy": 281.9747619628906,
+        "jerk": 23.69893455505371,
+        "ep_length": 335,
+        "action_mean": 3.8375866413116455,
+        "action_std": 4.735919952392578
+      },
+      {
+        "smoothness": 13.656242370605469,
+        "energy": 308.6576843261719,
+        "jerk": 23.362667083740234,
+        "ep_length": 801,
+        "action_mean": 4.017194747924805,
+        "action_std": 4.883028030395508
+      },
+      {
+        "smoothness": 13.729888916015625,
+        "energy": 287.6803894042969,
+        "jerk": 23.537336349487305,
+        "ep_length": 801,
+        "action_mean": 3.863616466522217,
+        "action_std": 4.732379913330078
+      }
+    ]
+  }
+}
